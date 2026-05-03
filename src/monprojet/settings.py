@@ -61,6 +61,8 @@ LOGIN_REDIRECT_URL = 'accounts:dashboard'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Ajout de WhiteNoise pour servir les fichiers statiques en production
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -138,7 +140,8 @@ USE_TZ = True
 MEDIA_URL = '/media/'  # URL publique pour accéder aux fichiers
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Dossier physique sur le serveur où les fichiers seront stockés
 
-STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Dossier de collecte des fichiers statiques pour la production
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Dossier des fichiers statiques principaux
 ]
