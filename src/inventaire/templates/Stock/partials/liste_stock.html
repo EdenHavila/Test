@@ -1,0 +1,75 @@
+
+{% for stock in stocks %}
+<tr  id="stock-{{ stock.id }}">
+    <td class="text-truncate"><a 
+        hx-get="{% url 'inventaire:detail-stock' stock.pk %}" 
+        hx-target="#modal-body" 
+        hx-swap="innerHTML" 
+        @click="$dispatch('open-modal')">{{stock.code}}</a>
+            {% if stock.alerte_stock %}
+            <span class="badge bg-danger ms-1" title="Stock en dessous/proche du seuil d'alerte">
+                ⚠️
+            </span>
+        {% endif %}
+    </td>
+    <td class="text-truncate">{{stock.bien.designation}}</td>
+    <td class="text-truncate">{{stock.lieu_stockage|default:"-"}}</td>
+    <td class="text-truncate">{{stock.quantite_disponible|default:"-"}}</td>
+    <td class="text-truncate">{{stock.unite|default:"-"}}</td>
+    <td class="text-truncate">{{stock.niveau_alerte|default:"-"}}</td>
+    <td class="text-truncate">{{stock.statut_bien|default:"-"}}</td>
+    <td class="text-truncate">{{stock.responsable_stock.username|default:"-"}}</td>
+    <td class="text-truncate">{{stock.date_mise_a_jour|default:"-"}}</td>
+
+
+
+
+    {# Actions #}
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-3">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-info"
+                    hx-get="{% url 'inventaire:detail-stock' stock.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'inventaire:modifier-stock' stock.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            
+            {# Bouton Supprimer #}
+            {% include "components/delete_button.html" with delete_url=stock.get_delete_url target_id=stock.get_target_id message="Voulez-vous supprimer ce stock ?" %}
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="12" class="text-center text-muted text-center ">Aucun Stock enregistré</td>
+</tr>
+{% endfor %}
+
+
+<!-- {% if not forloop.last %}, {% endif %} : pour espacer les données affichées par des virgules . ceci est fait uniquement du coté affichage et non dans la BD-->
+ 
+
+<!-- Utilisation de la balise with pour limiter l'affichage des spécialités à 2 et indiquer le nombre d'autres spécialités s'il y en a plus de 2 (version basique d'affichage directement dans le template)-->
+<!-- {% with specs=fournisseur.specialite.all %}
+            {% for spec in specs|slice:":2" %}
+                {{ spec.nom }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            {% if specs.count > 2 %}
+                <strong><span class="text-muted">+{{ specs.count|add:"-2" }} autres</span></strong> 
+            {% endif %}
+{% endwith %} -->

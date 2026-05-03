@@ -1,0 +1,125 @@
+{% load crispy_forms_tags %}
+
+<div class="ligne-form card mb-2 p-3 border" id="ligne-{{ form_idx }}">
+    <div class="row align-items-end g-2">
+        
+        {# ══════════════════════════════════════════════════════════════════ #}
+        {# TYPE (Bien/Service) - Champ avec HTMX, rendu manuellement          #}
+        {# ══════════════════════════════════════════════════════════════════ #}
+        <div class="col-md-2">
+            <div class="mb-3">
+                <label for="{{ form.type.id_for_label }}" class="form-label">
+                    {{ form.type.label }}
+                </label>
+                <select name="{{ form.type.html_name }}" 
+                        id="{{ form.type.id_for_label }}"
+                        class="form-select{% if form.type.errors %} is-invalid{% endif %}"
+                        hx-get="{% url 'commande:charger-items' %}"
+                        hx-trigger="change"
+                        hx-target="#item-container-{{ form_idx }}"
+                        hx-swap="innerHTML"
+                        hx-vals='js:{"prefix": "{{ form.prefix }}", "type": this.value}'>
+                    {% for value, label in form.type.field.choices %}
+                        <option value="{{ value }}" {% if form.type.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.type.errors %}
+                    <div class="invalid-feedback">{{ form.type.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {# ══════════════════════════════════════════════════════════════════ #}
+        {# BIEN / SERVICE - Container dynamique HTMX                          #}
+        {# ══════════════════════════════════════════════════════════════════ #}
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label class="form-label">Bien / Service</label>
+                <div id="item-container-{{ form_idx }}" class="item-container">
+                    {% if form.instance.type == 'Bien' and form.instance.bien %}
+                        <select name="{{ form.bien.html_name }}" class="form-select">
+                            <option value="">-- Sélectionner un bien --</option>
+                            {% for bien in form.bien.field.queryset %}
+                                <option value="{{ bien.pk }}" {% if form.instance.bien.pk == bien.pk %}selected{% endif %}>
+                                    {{ bien.reference }} - {{ bien.designation }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="{{ form.service.html_name }}" value="">
+                    {% elif form.instance.type == 'Service' and form.instance.service %}
+                        <select name="{{ form.service.html_name }}" class="form-select">
+                            <option value="">-- Sélectionner un service --</option>
+                            {% for service in form.service.field.queryset %}
+                                <option value="{{ service.pk }}" {% if form.instance.service.pk == service.pk %}selected{% endif %}>
+                                    {{ service.reference }} - {{ service.designation }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="{{ form.bien.html_name }}" value="">
+                    {% else %}
+                        <select class="form-select" disabled>
+                            <option value="">-- Choisir d'abord un type --</option>
+                        </select>
+                        <input type="hidden" name="{{ form.bien.html_name }}" value="">
+                        <input type="hidden" name="{{ form.service.html_name }}" value="">
+                    {% endif %}
+                </div>
+                {% if form.bien.errors %}
+                    <div class="text-danger small">{{ form.bien.errors|join:", " }}</div>
+                {% endif %}
+                {% if form.service.errors %}
+                    <div class="text-danger small">{{ form.service.errors|join:", " }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {# ══════════════════════════════════════════════════════════════════ #}
+        {# QUANTITÉ - Crispy field                                            #}
+        {# ══════════════════════════════════════════════════════════════════ #}
+        <div class="col-md-2">
+            {{ form.quantite|as_crispy_field }}
+        </div>
+        
+        {# ══════════════════════════════════════════════════════════════════ #}
+        {# PRIX UNITAIRE - Crispy field                                       #}
+        {# ══════════════════════════════════════════════════════════════════ #}
+        <div class="col-md-2">
+            {{ form.prix_unitaire|as_crispy_field }}
+        </div>
+        
+        {# ══════════════════════════════════════════════════════════════════ #}
+        {# BOUTON SUPPRIMER                                                   #}
+        {# ══════════════════════════════════════════════════════════════════ #}
+        <div class="col-md-2 d-flex align-items-end mb-3">
+            {% if form.DELETE %}
+                <input type="hidden" name="{{ form.DELETE.html_name }}" value="" class="delete-checkbox">
+            {% endif %}
+            <button type="button" 
+                    class="btn btn-outline-danger w-100"
+                    onclick="supprimerLigne(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    
+    {# Champs cachés nécessaires pour l'édition #}
+    {% if form.instance.pk %}
+        <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+    {% endif %}
+</div>
+
+<script>
+function supprimerLigne(btn) {
+    const ligne = btn.closest('.ligne-form');
+    const deleteInput = ligne.querySelector('.delete-checkbox');
+    
+    if (deleteInput) {
+        deleteInput.value = 'on';
+        ligne.style.display = 'none';
+    } else {
+        ligne.remove();
+    }
+    
+    updateFormsetManagement();
+}
+</script>

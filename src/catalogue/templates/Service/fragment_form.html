@@ -1,0 +1,50 @@
+{% load crispy_forms_tags %}
+<h3 class="mb-4">
+    <i class="bi bi-gear"></i>
+    {% if service %}Modifier le{% else %}Nouveau{% endif %} service
+</h3>
+<form method="post"
+      hx-post="{% if is_editing %}{% url 'catalogue:modifier-service' service.id %}{% else %}{% url 'catalogue:ajouter-service' %}{% endif %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      id="service-form">
+    {% csrf_token %}
+    {{ form.media }}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ form.non_field_errors }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-info-circle"></i> Informations du service
+        </legend>
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.sous_categorie|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.frequence|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-12">
+                {{ form.designation|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-12">
+                {{ form.description|as_crispy_field }}
+            </div>
+        </div>
+    </fieldset>
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-secondary" @click="$dispatch('close-modal')">
+            <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> {% if service %}Modifier{% else %}Enregistrer{% endif %}
+        </button>
+    </div>
+</form>

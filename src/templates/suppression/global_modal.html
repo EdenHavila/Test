@@ -1,0 +1,14 @@
+<div x-data={showDeleteModal: false}     @open-delete-modal.window="showDeleteModal = true"     @close-delete-modal.window="showDeleteModal = false">
+<div
+    class="modal fade"
+    style="display:none; background: rgba(0,0,0,0.5)"
+    x-show="showDeleteModal"
+    x-transition
+>
+    <div class="modal-dialog">
+        <div class="modal-content" id="modal-content">
+            <!-- HTMX injecte tout le contenu ici -->
+        </div>
+    </div>
+</div>
+</div>

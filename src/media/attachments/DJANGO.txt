@@ -1,0 +1,62 @@
+
+##############BONNE ARCHITECTURE DE PROJET####################
+
+/mon-dossier-de-projet
+  ├── env/                 # Environnement virtuel
+  ├── monprojet(src)/           # Dossier contenant le projet Django (les fichiers `manage.py`, `settings.py`, etc.)
+  ├── requirements.txt     # Fichier pour les dépendances
+  └── README.md            # Documentation du projet
+
+
+
+
+chaine de caractere(chemin url) relié a une vue qui nous est retourné
+
+patch("chemin", vue)
+
+la vue permet de faire le lien entre le chemin url et le html qu'on veut faire voir
+le html s'ecrit dans un template
+|: pour specifier que nous allons utiliser un filtre sur notre variable qu'on integre dans le template(html)
+
+
+pourquoi creer une application dans django?
+-separer les choses
+-pour faciliter la maintenance
+-pour la reutilisation dans d'autres projets
+
+
+migration->fichiers permettant de creer des modeles a l'interieur d'une base de données
+
+##########03-03-2025#############
+{% url 'nom de l'url ' %}
+{% extends "nom du fichier html" %}
+{% include"nom du fichier html" %}
+
+
+{%block%}
+{%endblock%}
+
+#############structure d'un projet modulaire et professionnel#####################
+
+src/
+│
+├── myproject/              # Dossier principal du projet (contenant les settings, urls, wsgi, etc.)
+│   ├── __init__.py
+│   ├── settings.py         # Paramètres de configuration du projet
+│   ├── urls.py             # URLs globales du projet
+│   ├── asgi.py
+│   ├── wsgi.py
+│   └── settings/           # Dossier contenant des fichiers de settings supplémentaires (si nécessaire)
+│
+├── apps/  		    #les applications du projet
+│		    
+├── templates/              # Dossier global pour les templates de base
+│   ├── base.html           # Template de base (héritage avec 'extends')
+│   ├── header.html         # Template de l'en-tête (inclus avec 'include')
+│   ├── footer.html         # Template du pied de page (inclus avec 'include')
+│
+├── static/                 # Dossier pour les fichiers statiques (CSS, JS, images)
+│
+├── media/                  # Dossier pour les fichiers médias (uploads d'images, etc.)
+│
+└── manage.py               # Script pour gérer le projet Django (migrations, serveur, etc.)

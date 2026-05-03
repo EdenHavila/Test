@@ -1,0 +1,43 @@
+{% csrf_token %}
+
+<div class="modal fade mon-bootstrap"
+     style="display:none; background: rgba(0,0,0,0.5);"
+     x-show="open"
+     @close-delete-modal.window="handleClose()"
+     @keydown.escape.window="open = false"
+     x-transition.duration.300ms
+>
+
+    <div class="modal-dialog modal-dialog-centered" >
+        <div class="modal-content shadow-sm rounded-3" style="background: #fff;width: 30%" @click.outside="open = false" >
+
+            <div class="modal-header">
+                <h5 class="modal-title">{{ title|default:"Confirmation" }}</h5>
+                <button class="btn-close" @click="open=false"></button>
+            </div>
+
+            <div class="modal-body">
+                <p x-text="message || '{{ message|default:'Confirmer la suppression ?' }}'"></p>
+            </div>
+
+            <div class="modal-footer d-flex gap-3">
+                <button class="btn btn-secondary" @click="open=false">Annuler</button>
+
+                <button
+                    class="btn btn-danger"
+                    @click="
+                        htmx.ajax('POST', delete_url, {
+                            target: target_id,
+                            swap: 'outerHTML',
+                            headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+                        });
+                        open = false;
+                    "
+                >
+                    Supprimer
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

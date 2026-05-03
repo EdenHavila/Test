@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+<h3 class="mb-4">
+    <i class="bi bi-box-seam"></i> 
+    {% if bien %}Modifier le{% else %}Nouveau{% endif %} bien
+</h3>
+<form method="post"
+      hx-post="{% if is_editing %}{% url 'catalogue:modifier-bien' bien.id %}{% else %}{% url 'catalogue:ajouter-bien' %}{% endif %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      id="bien-form">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-secondary" @click="$dispatch('close-modal')">
+            <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> {% if bien %}Modifier{% else %}Enregistrer{% endif %}
+        </button>
+    </div>
+</form>

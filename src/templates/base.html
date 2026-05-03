@@ -1,0 +1,544 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <!-- Lien vers le CSS préfixé -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-prefixed.css' %}">
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.12.1/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <!-- Select2 (utilisé pour Commande/Livraison) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+    {{ form.media }}
+  </head>
+
+  <body>
+    <div class="layout-wrapper">
+      <div class="layout-container">
+        <aside class="vertical-menu" id="vertical-menu">
+          <div class="logo">
+            <a href="#"><img src="{% static 'ressources/logo_ncare.png' %}" alt="logo-pg" width="150"/></a>
+          </div>
+          <ul class="menu">
+            <li class="menu-item">
+              <div class="menu-link">
+                <ion-icon name="speedometer-outline"></ion-icon> <span class="text">Dashboard</span>
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get="{% url 'accounts:dashboard-index' %}" hx-target="#content-wrapper" hx-swap="innerHTML" hx-trigger="load, click">Vue d'ensemble</a></li>
+              </ul>
+            </li>
+            <li class="menu-item">
+              <div class="menu-link">
+                <ion-icon name="mail-outline"></ion-icon>Demandes
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get= "{% url 'Demande:index'%}" hx-target="#content-wrapper" hx-swap="innerHTML">Toutes les demandes </a></li>
+                <li class="sub-item"><a hx-get="{% url 'Demande:mes-demandes' %}" hx-target="#content-wrapper" hx-swap="innerHTML">Mes demandes</a></li>
+                <li class="sub-item "><a href= "#" class="nav-link">Demandes traitées</a>
+                </li>
+              </ul>
+            </li>
+            <li class="menu-item">
+              <div class="menu-link">
+                <ion-icon name="cart-outline"></ion-icon> <span class="text">Commandes</span>
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get="{% url 'commande:index-commande' %}" hx-target="#content-wrapper" hx-swap="innerHTML" >liste des commandes</a></li>
+                <!-- <li class="sub-item"><a href="#">Etudiants avec thème validé</a> </li> -->
+              </ul>
+            </li>
+            <li class="menu-item">
+              <div class="menu-link">
+                <i class="bi bi-truck"></i><span class="text">Livraisons</span> 
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get="{% url 'commande:index-livraison' %}" hx-target="#content-wrapper" hx-swap="innerHTML" >Livraisons effectuées</a></li>
+                <!-- <li class="sub-item"><a href="#">Etudiants avec thème validé</a></li> -->
+              </ul>
+            </li>
+            <li class="menu-item">
+              <div class="menu-link">
+                <ion-icon name="people-outline"></ion-icon> Fournisseurs
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get=  "{% url 'Fournisseur:index'%}" hx-target="#content-wrapper" hx-swap="innerHTML" >Liste des fournisseurs</a></li>
+                <!-- <li class="sub-item"><a href="#">Etudiants avec thème validé</a></li> -->
+              </ul>
+            </li>
+            <li class="menu-item">
+              <div class="menu-link">
+                <ion-icon name="pricetags-outline"></ion-icon><span class="text">Catalogue</span>
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get= "{% url 'catalogue:index-bien'%}"  hx-target="#content-wrapper" hx-swap="innerHTML"  >Liste des Biens</a></li>
+                <li class="sub-item"><a hx-get= "{% url 'catalogue:index-service'%}"  hx-target="#content-wrapper" hx-swap="innerHTML"  >Liste des Services</a></li>
+                <li class="sub-item"><a href="#" class="nav-link">Categories</a></li>
+                <li class="sub-item"><a href="#" class="nav-link">Famille</a></li>
+              </ul>
+            </li>
+            <li class="menu-item">
+              <div class="menu-link">
+                <ion-icon name="notifications-outline"></ion-icon> <span class="text">Mouvements</span>
+              </div>
+              <ul class="option-sub">
+                <li class="sub-item"><a hx-get= "{% url 'inventaire:index-stock'%}" hx-target="#content-wrapper" hx-swap="innerHTML">Stock </a></li>
+                <li class="sub-item"><a hx-get= "{% url 'inventaire:index-mouvement'%}" hx-target="#content-wrapper" hx-swap="innerHTML">Mouvements</a></li>
+              </ul>
+            </li>
+            <li class="menu-item">
+              <a href="ok"></a><div class="menu-link">
+                <ion-icon name="settings-outline"></ion-icon> Parametre
+              </div></a>
+     
+            </li>
+ 
+          </ul>
+        </aside>
+{% block overlay %}
+        <div class="overlay"></div>
+{% endblock %}
+        <div class="content-wrapper" id="content-wrapper">
+           {% block content %}
+          <div class="container">
+            <!-- <nav> -->
+              <div class="burger-menu"><i class="bi bi-list"></i></div>
+
+              <div class="navbar-right">
+                <div class="search-bar">
+                  <ion-icon name="search-outline"></ion-icon>
+                  <input type="text" placeholder="Search" />
+                </div>
+
+                <div class="user">
+                  <div class="avatar">
+                   Bonjour, {{ request.user.username }} <img src="{% static 'ressources/1.png' %}" alt="" width="50" />
+                  </div>
+                </div>
+              </div>
+            <!-- </nav> -->
+
+            <!-- <div class="filter-bar"> -->
+              <div class="filter">
+                <div class="filter-item-society">
+                  <label for="filter">Filtrer par société:</label>
+                  <select name="filter" id="filter">
+                    <option value="all">Tous</option>
+                    <option value="pending">Pigier</option>
+                    <option value="treated">Pigier</option>
+                  </select>
+                </div>
+
+                <div class="filter-item-diplome">
+                  <label for="filter">Filtrer par diplôme:</label>
+                  <select name="filter" id="filter">
+                    <option value="all">Tous</option>
+                    <option value="pending">BTS</option>
+                    <option value="pending">LICENCE</option>
+                    <option value="treated">MASTER</option>
+                  </select>
+                </div>
+              </div>
+            <!-- </div> -->
+            <!-- <div class="content"> -->
+              <div class="card">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th class="text-truncate">Nom et prénoms</th>
+                        <th class="text-truncate">Matricule</th>
+                        <th class="text-truncate">Thème</th>
+                        <th class="text-truncate">Statut</th>
+                        <th class="text-truncate">Statut</th>
+                        <th class="text-truncate">Statut</th>
+                        <th class="text-truncate">Statut</th>
+                        <th class="text-truncate">Statut</th>
+                        <th class="text-truncate">Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <!-- autre -->
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                      <tr>
+                        <td class="text-truncate">Lorem ipsum dolor sit.</td>
+                        <td class="text-truncate">lorem3</td>
+                        <td class="text-truncate">
+                          Lorem ipsum dolor sit, amet consectetur adipisicing
+                          elit. Nisi, repudiandae?
+                        </td>
+                        <td class="text-truncate">loremeeeeee</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            <!-- </div> -->
+          </div>
+          {% endblock %}
+        </div>
+      </div>
+          <!--  -->
+  <!-- mon-bootstrap est la classe  pour définir le scope(l'endroit) ou boostrap pourra etre appliqué sans affecter le reste de ma page (un peu comme un shadow dom)-->
+  <div x-data="{ open: false }" @open-modal.window="open = true" @close-modal.window="open = false; document.getElementById('modal-body').innerHTML = '';500 " @keydown.escape.window="open = false">
+      <div id="myModal" class="modal "  x-show="open"  x-transition:enter.duration.500ms x-transition:leave.duration.900ms>
+        <div class="modal-content mon-bootstrap" @click.outside="open = false">
+          <span class="close" @click="open = false">&times;</span>
+             <div id="modal-body">
+                   <!--  ici sera injecté le contenu des formulaires renvoyés par HTMX apres le clic sur les bouton d'ajout ou de modification d'un élment -->
+             </div>
+        </div>
+      </div>
+
+  </div>
+
+
+  </div>
+      <div id="loader" style="display:none; position:fixed; top:10px; right:10px; z-index:1000;">
+          <div class="spinner"></div>
+      </div>
+  </div>
+
+  <!-- ✅ Messages Django avec HTMX + Alpine.js (ici sera injecté le template des messages apres la requete GET  vers l'url de 'messages')-->
+    <div id="messages-container" class="position-fixed top-0 end-0 p-3 mon-bootstrap" style="z-index: 1050;">
+        {% include "messages.html" %}
+    </div>
+
+<div x-data="deleteModal()" @open-delete-modal.window="handleOpen($event)">
+    {% include 'components/delete_modal.html'   %}
+</div>
+
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="{% static 'js/spa.js' %}"  ></script>
+
+    <script src="{% static 'js/bundle.js' %}" type="module" defer></script>
+
+      <!-- script alpine+htmx pour rafraichir les messages apres soumission du formulaire (en écoutant l'évenment 'refresh-messages' retourné par la vue django au travers de : response["HX-Trigger"] = "refresh-messages") -->
+     <script>
+        document.body.addEventListener("refresh-messages", function () {
+              console.log("➡️ Lancement de la requête HTMX → /messages");
+            // recharge le bloc messages via HTMX
+            htmx.ajax("GET", "{% url 'messages_partial' %}", {
+                target: "#messages-container",
+                swap: "innerHTML"
+            });
+        });
+    </script>
+    <!-- script alpine pour la modale de suppression -->
+    <script>
+        function deleteModal() {
+
+            return {
+                open: false,
+                delete_url: "", // Initialisation vide
+                target_id: "", // Initialisation vide
+                message:"",
+
+                // Afficher la modale de suppression avec les valeurs passées par le bouton correspondant
+                handleOpen(event) {
+                    console.log("Modal reçoit :", event.detail);// Vérifier dans la console que ces valeurs arrivent
+                    // Mise à jour des variables Alpine
+                    this.delete_url = event.detail.delete_url; // Assigner à delete_url
+                    this.target_id = event.detail.target_id;
+                    this.message = event.detail.message;
+
+                    this.open = true; // Afficher la modale
+
+                    console.log('delete_url:', this.delete_url);   // Vérifie si la valeur est bien mise à jour
+                    console.log('target_id:', this.target_id);     // Vérifie si la valeur est bien mise à jour
+                    console.log('message:', this.message);
+                },
+
+
+                handleClose() {
+                    this.open = false;
+                }
+
+            }
+        }
+    </script>
+
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+
+<!-- Select2 initialization moved to individual templates where needed -->
+
+  </body>
+</html>

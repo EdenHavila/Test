@@ -1,0 +1,97 @@
+{% for livraison in livraisons %}
+<tr id="livraison-{{ livraison.id }}">
+    {# Code de la livraison #}
+    <td class="text-truncate">
+        <a 
+        hx-get="{% url 'commande:detail-livraison' livraison.pk %}" 
+        title="{{ livraison.code_livraison }}"
+        hx-target="#modal-body" 
+        hx-swap="innerHTML" 
+        @click="$dispatch('open-modal')">{{ livraison.code_livraison }}
+        </a>
+    </td>
+    
+    {# Commande associée #}
+    <td class="text-truncate">
+        <a hx-get="{% url 'commande:detail-commande' livraison.commande.pk %}" 
+           hx-target="#modal-body" 
+           hx-swap="innerHTML" 
+           @click="$dispatch('open-modal')">
+            {{ livraison.commande.code_cmnd|default:"-" }}
+        </a>
+    </td>
+
+    {# Date de livraison #}
+    <td class="text-truncate">
+        {{ livraison.date_livraison|date:"d/m/Y" }}
+    </td>
+
+    {# Date d'enregistrement #}
+    <td class="text-truncate">
+        {{ livraison.date_enregistrement|date:"d/m/Y H:i" }}
+    </td>
+    
+    {# Statut avec badge coloré #}
+    <td class="text-truncate">
+        <span class="badge 
+            {% if livraison.statut == 'en_attente' %}bg-warning text-dark
+            {% elif livraison.statut == 'partielle' %}bg-info
+            {% elif livraison.statut == 'complete' %}bg-success
+            {% elif livraison.statut == 'annulee' %}bg-danger
+            {% else %}bg-secondary{% endif %}">
+            {{ livraison.get_statut_display }}
+        </span>
+    </td>
+    
+    {# Fichier bon de livraison #}
+    <td class="text-truncate mon-bootstrap">
+        {% if livraison.fichier_bon_livraison %}
+            <a href="{{ livraison.fichier_bon_livraison.url }}" 
+               target="_blank" 
+               class="btn btn-sm btn-outline-secondary"
+               title="Télécharger le bon de livraison">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+            </a>
+        {% else %}
+            <span class="text-muted">-</span>
+        {% endif %}
+    </td>
+    
+    {# Actions #}
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-2">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-info"
+                    hx-get="{% url 'commande:detail-livraison' livraison.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'commande:modifier-livraison' livraison.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            
+            {# Bouton Supprimer #}
+            {% include "components/delete_button.html" with delete_url=livraison.get_delete_url target_id=livraison.get_target_id message="Voulez-vous supprimer cette livraison ?" %}
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="text-center text-muted py-4">
+        <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+        Aucune livraison trouvée
+    </td>
+</tr>
+{% endfor %}

@@ -1,0 +1,19 @@
+{# Ce fragment rend le champ type_demande avec label et attributs HTMX #}
+{% load crispy_forms_tags %}
+<div class="mb-0">
+    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">Type demande*</label>
+    <select
+        name="{{ field.html_name }}"
+        id="{{ field.id_for_label }}"
+        class="form-select"
+        hx-get="{% url 'Demande:charge_champ_demandes' %}"
+        hx-trigger="change"
+        hx-target="#zone-demandes-associees"
+        hx-swap="innerHTML"
+        {% if field.field.disabled %}disabled{% endif %}
+    >
+        {% for option in field.field.choices %}
+            <option value="{{ option.0 }}" {% if option.0 == field.value %}selected{% endif %}>{{ option.1 }}</option>
+        {% endfor %}
+    </select>
+</div>

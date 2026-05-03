@@ -1,0 +1,86 @@
+
+{% for demande in demandes %}
+<tr  id="demande-{{ demande.id }}">
+    <td class="text-truncate">
+        <a href="#"
+           hx-get="{% url 'Demande:detail-demande' demande.id %}"
+           hx-target="#modal-body"
+           hx-swap="innerHTML"
+           @click="$dispatch('open-modal')">
+            {{demande.code_demande}}
+        </a>
+    </td>
+    <td class="text-truncate">
+        <span class="badge {% if demande.type_demande == 'Gestionnaire' %}bg-purple{% else %}bg-info{% endif %}">
+            {{demande.type_demande}}
+        </span>
+        {% if demande.type_demande == 'Gestionnaire' and demande.demandes_associees.count > 0 %}
+            <span class="badge bg-secondary ms-1" title="Demandes regroupées">
+                <i class="bi bi-collection"></i> {{ demande.demandes_associees.count }}
+            </span>
+        {% endif %}
+        {% if demande.type_demande == 'Demandeur' and demande.regroupee_par.count > 0 %}
+            <span class="badge bg-success ms-1" title="Regroupée">
+                <i class="bi bi-link"></i>
+            </span>
+        {% endif %}
+    </td>
+    <td class="text-truncate">
+        <span class="badge {% if demande.nature_demande == 'Bien' %}bg-info{% else %}bg-purple{% endif %}">
+            {{demande.nature_demande}}
+        </span>
+    </td>
+    <td class="text-truncate">{{demande.date_demande|date:"d/m/Y"}}</td>
+    <td class="text-truncate">{{demande.date_enregistrement|date:"d/m/Y H:i"|default:"-"}}</td>
+    <td class="text-truncate">{{demande.date_mise_a_jour|date:"d/m/Y H:i"|default:"-"}}</td>
+    <td class="text-truncate">{{demande.motif_demande|truncatechars:20}}</td>
+    <td class="text-truncate">
+        <span class="badge 
+            {% if demande.statut_demande == 'En cours' %}bg-warning text-dark
+            {% elif demande.statut_demande == 'Validée' %}bg-success
+            {% elif demande.statut_demande == 'Rejetée' %}bg-danger
+            {% elif demande.statut_demande == 'Traitement' %}bg-info
+            {% elif demande.statut_demande == 'Traitée' %}bg-primary
+            {% else %}bg-secondary{% endif %}">
+            {{demande.statut_demande}}
+        </span>
+    </td>
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-2">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    hx-get="{% url 'Demande:detail-demande' demande.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir détails">
+                    <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'Demande:modifier-demande' demande.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier" >
+                    <i class="bi bi-pencil"></i>
+            </button>
+            
+            {# Bouton Supprimer #}
+            {% include "components/delete_button.html" with delete_url=demande.get_delete_url target_id=demande.get_target_id message="Voulez-vous supprimer ?" %}
+        </div>
+    </td>
+  
+</tr>
+{% empty %}
+<tr>
+    <td colspan="9" class="text-center text-muted py-4">
+        <i class="bi bi-inbox d-block mb-2" style="font-size: 2rem;"></i>
+        Aucune demande trouvée
+    </td>
+</tr>
+{% endfor %}
+

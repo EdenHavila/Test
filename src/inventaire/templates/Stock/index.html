@@ -1,0 +1,148 @@
+{% load static %}
+
+          <div class="container">
+            <!-- Navigation avec titre et recherche -->
+            <nav class="page-header">
+              <div class="header-left">
+                <div class="burger-menu"><i class="bi bi-list"></i></div>
+                <h1 class="page-title">Gestion des Stocks</h1>
+              </div>
+
+              <div class="header-right">
+                <div class="search-box">
+                  <ion-icon name="search-outline"></ion-icon>
+                  <input type="search" 
+                         name="q" 
+                         id="search-stock"
+                         placeholder="Rechercher par code ou bien..." 
+                         hx-get="{% url 'inventaire:liste-stock' %}"
+                         hx-trigger="keyup changed delay:300ms"
+                         hx-target="#liste-biens"
+                         hx-include="[name='lieu'], [name='statut'], [name='unite'], [name='date_debut'], [name='date_fin']"
+                         autocomplete="off" />
+                </div>
+
+                <div class="user">
+                  <div class="avatar">
+                    <img src="{% static 'ressources/1.png' %}" alt="" width="50" />
+                  </div>
+                </div>
+              </div>
+            </nav>
+
+            <!-- Barre de filtres contextuels -->
+            <div class="filter-bar">
+              <div class="filter">
+                <div class="filter-item">
+                  <label for="filter-lieu">Lieu :</label>
+                  <select name="lieu" id="filter-lieu"
+                          hx-get="{% url 'inventaire:liste-stock' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-biens"
+                          hx-include="[name='q'], [name='statut'], [name='unite'], [name='date_debut'], [name='date_fin']">
+                    <option value="">Tous</option>
+                    <option value="entrepot1">Entrepôt 1</option>
+                    <option value="entrepot2">Entrepôt 2</option>
+                    <option value="stock_central">Stock central</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+
+                <div class="filter-item">
+                  <label for="filter-statut">Statut :</label>
+                  <select name="statut" id="filter-statut"
+                          hx-get="{% url 'inventaire:liste-stock' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-biens"
+                          hx-include="[name='q'], [name='lieu'], [name='unite'], [name='date_debut'], [name='date_fin']">
+                    <option value="">Tous</option>
+                    <option value="disponible">Disponible</option>
+                    <option value="indisponible">Indisponible</option>
+                  </select>
+                </div>
+
+                <div class="filter-item">
+                  <label for="filter-unite">Unité :</label>
+                  <select name="unite" id="filter-unite"
+                          hx-get="{% url 'inventaire:liste-stock' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-biens"
+                          hx-include="[name='q'], [name='lieu'], [name='statut'], [name='date_debut'], [name='date_fin']">
+                    <option value="">Tous</option>
+                    <option value="piece">Pièce</option>
+                    <option value="boite">Boîte</option>
+                    <option value="litre">Litre</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+
+                <div class="filter-item filter-date">
+                  <label for="filter-date-debut">MAJ du :</label>
+                  <input type="date" name="date_debut" id="filter-date-debut"
+                         hx-get="{% url 'inventaire:liste-stock' %}"
+                         hx-trigger="change"
+                         hx-target="#liste-biens"
+                         hx-include="[name='q'], [name='lieu'], [name='statut'], [name='unite'], [name='date_fin']" />
+                </div>
+
+                <div class="filter-item filter-date">
+                  <label for="filter-date-fin">Au :</label>
+                  <input type="date" name="date_fin" id="filter-date-fin"
+                         hx-get="{% url 'inventaire:liste-stock' %}"
+                         hx-trigger="change"
+                         hx-target="#liste-biens"
+                         hx-include="[name='q'], [name='lieu'], [name='statut'], [name='unite'], [name='date_debut']" />
+                </div>
+
+                <div class="filter-actions">
+                  <button type="button" class="btn-reset" 
+                          onclick="resetFilters('stock')"
+                          title="Réinitialiser les filtres">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="content">
+              <div class="card">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+
+                        <tr>
+                            <th class="text-truncate">Reference</th>
+                            <th class="text-truncate">Bien</th>
+                            <th class="text-truncate">Lieu Stockage</th>
+                            <th class="text-truncate">Quantité</th>
+                            <th class="text-truncate">Unité</th>
+                            <th class="text-truncate">Niveau alerte</th>
+                            <th class="text-truncate">Statut</th>
+                            <th class="text-truncate">Responsable stock</th>
+                            <th class="text-truncate">Date MAJ</th>
+                            <th class="text-truncate">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="liste-biens" hx-get="{% url 'inventaire:liste-stock' %}" hx-trigger="load, refresh-messages from:body" hx-swap="innerHTML">
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% block modal_request %}
+<div class="modal_request">
+    <button class="new_request"
+            hx-get="{% url 'inventaire:ajouter-stock' %}"
+            hx-target="#modal-body"
+            hx-swap="innerHTML"
+            @click="$dispatch('open-modal')">
+        Ajouter un stock
+        <ion-icon name="add-circle-outline"></ion-icon>
+    </button>
+</div>
+
+{% endblock modal_request %}

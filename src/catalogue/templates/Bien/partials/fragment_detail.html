@@ -1,0 +1,154 @@
+<div class="mon-bootstrap p-3">
+    <div class="mb-2">
+        <h5 class="mb-1 d-flex align-items-center justify-content-between">
+            <span>
+                <i class="bi bi-box-seam me-2"></i>
+                {{ bien.designation }}
+                <span class="badge bg-primary align-middle ms-2">
+                    {{ bien.reference }}
+                </span>
+            </span>
+        </h5>
+        <div class="text-end mt-1">
+            <button type="button"
+                    class="btn btn-outline-warning btn-sm px-3"
+                    hx-get="{% url 'catalogue:modifier-bien' bien.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    title="Modifier ce bien"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top">
+                <i class="bi bi-pencil"></i> Modifier
+            </button>
+        </div>
+    </div>
+
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-info-circle"></i> Informations générales
+        </legend>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Référence</small>
+                        <strong>{{ bien.reference|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Désignation</small>
+                        <strong>{{ bien.designation|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Sous-catégorie</small>
+                        <strong>{{ bien.sous_categorie|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Catégorie</small>
+                        <strong>{{ bien.sous_categorie.categorie|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Famille</small>
+                        <strong>{{ bien.sous_categorie.categorie.famille|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Fréquence d'utilisation</small>
+                        <span class="badge 
+                            {% if bien.frequence_utilisation == 'hebdomadaire' %}bg-success
+                            {% elif bien.frequence_utilisation == 'mensuel' %}bg-info
+                            {% elif bien.frequence_utilisation == 'annuel' %}bg-warning text-dark
+                            {% elif bien.frequence_utilisation == 'ponctuel' %}bg-secondary
+                            {% else %}bg-light text-dark{% endif %}">
+                            {{ bien.get_frequence_utilisation_display|default:"-" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-tags"></i> Caractéristiques
+        </legend>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Marque</small>
+                        <strong>{{ bien.marque|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Modèle</small>
+                        <strong>{{ bien.modele|default:"-" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if bien.informations_complementaires %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-2">
+                        <small class="text-muted d-block">Informations complémentaires</small>
+                        <div class="mt-1">{{ bien.informations_complementaires|linebreaks }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </fieldset>
+
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-diagram-3"></i> Hiérarchie
+        </legend>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <i class="bi bi-folder me-1"></i>
+                    {{ bien.sous_categorie.categorie.famille|default:"Famille" }}
+                </li>
+                <li class="breadcrumb-item">
+                    {{ bien.sous_categorie.categorie|default:"Catégorie" }}
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ bien.sous_categorie|default:"Sous-catégorie" }}
+                </li>
+            </ol>
+        </nav>
+    </fieldset>
+
+    <div class="d-flex justify-content-center mt-4">
+        <button type="button" class="btn btn-secondary" @click="$dispatch('close-modal')">
+            <i class="bi bi-x-circle"></i> Fermer
+        </button>
+    </div>
+</div>

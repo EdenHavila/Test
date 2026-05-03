@@ -1,0 +1,136 @@
+{% load crispy_forms_tags %}
+
+<h3 class="mb-4">
+    <i class="bi bi-cart-plus"></i>
+    {% if demande %}Modifier la{% else %}Nouvelle{% endif %} demande
+</h3>
+
+<form method="post"
+      hx-post="{% if demande %}{% url 'Demande:modifier-demande' demande.pk %}{% else %}{% url 'Demande:ajouter-demande' %}{% endif %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      enctype="multipart/form-data"
+      id="demande-form">
+    {% csrf_token %}
+    {{ form.media }}
+
+    <!-- SECTION 1 : INFORMATIONS PRINCIPALES -->
+
+    <fieldset class="border rounded p-4 mb-4 bg-white shadow-sm">
+        <legend class="float-none w-auto px-2 fs-5 fw-bold text-primary mb-3">
+            <i class="bi bi-info-circle"></i> Informations générales
+        </legend>
+        <div class="row g-4 align-items-center mb-2">
+            <div class="col-md-4">
+                {# On rend le champ type_demande avec les attributs HTMX directement sur le select #}
+                {% with field=form.type_demande %}
+                    {% include "Demande/partials/type_demande_htmx.html" with field=field %}
+                {% endwith %}
+            </div>
+            <div class="col-md-4">
+                {{ form.nature_demande|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.fichier_joint|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row g-4 align-items-center mb-2">
+            <div class="col-md-4">
+                {{ form.date_demande|as_crispy_field }}
+            </div>
+            <div class="col-md-8">
+                {{ form.motif_demande|as_crispy_field }}
+            </div>
+        </div>
+        <div id="zone-demandes-associees" class="mt-3">
+            {% include "Demande/partials/champ_demandes_associees.html" %}
+        </div>
+        
+        {# Champ statut_demande : visible uniquement pour les gestionnaires #}
+        {% if form.statut_demande %}
+        <div class="row g-4 align-items-center mt-3">
+            <div class="col-md-6">
+                {{ form.statut_demande|as_crispy_field }}
+            </div>
+        </div>
+        {% endif %}
+    </fieldset>
+
+    <!-- SECTION 2 : DÉTAILS DE LA DEMANDE -->
+
+    <fieldset class="border rounded p-2 mb-4 bg-white shadow-sm">
+        <legend class="float-none w-auto px-2 fs-5 fw-bold text-primary mb-3">
+            <i class="bi bi-list-ul"></i> Détails de la demande
+        </legend>
+        {{ formset.management_form }}
+        <div id="lignes-container">
+            {% for ligne_form in formset %}
+                {% include 'Demande/partials/ligne_details_demande.html' with form=ligne_form form_idx=forloop.counter0 %}
+            {% empty %}
+                <p class="text-muted text-center py-3">
+                    <i class="bi bi-inbox"></i> Aucune ligne ajoutée
+                </p>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+            <button type="button"
+                    class="btn btn-outline-primary btn-sm px-4 py-2"
+                    hx-get="{% url 'Demande:ligne-add' %}"
+                    hx-target="#lignes-container"
+                    hx-swap="beforeend"
+                    hx-vals='js:{"form_idx": document.querySelectorAll(".formset-item").length}'>
+                <i class="bi bi-plus-circle"></i> Ajouter une ligne
+            </button>
+        </div>
+    </fieldset>
+
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-secondary" @click="$dispatch('close-modal')">
+            <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i>
+            {% if demande %}Modifier{% else %}Créer{% endif %}
+        </button>
+    </div>
+</form>
+            
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // Ajout dynamique d'une ligne de formset
+        const addBtn = document.getElementById('add-form');
+        if (addBtn) {
+            addBtn.addEventListener('click', function () {
+                const container = document.getElementById('formset-container');
+                const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                const formCount = parseInt(totalForms.value);
+                const firstForm = container.querySelector('.formset-item');
+                if (!firstForm) return;
+                const newForm = firstForm.cloneNode(true);
+                // Nettoyage des valeurs
+                newForm.querySelectorAll('input, select, textarea').forEach(function (input) {
+                    if (input.type !== 'hidden') input.value = '';
+                    // Met à jour les attributs name/id
+                    if (input.name) input.name = input.name.replace(/-\d+-/, '-' + formCount + '-');
+                    if (input.id) input.id = input.id.replace(/-\d+-/, '-' + formCount + '-');
+                });
+                // Ajoute la nouvelle ligne
+                container.appendChild(newForm);
+                totalForms.value = formCount + 1;
+            });
+        }
+        // Suppression d'une ligne de formset
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('delete-form')) {
+                const item = e.target.closest('.formset-item');
+                if (item && item.parentNode.children.length > 1) {
+                    item.remove();
+                    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+                    totalForms.value = parseInt(totalForms.value) - 1;
+                }
+            }
+        });
+    });
+</script>
+

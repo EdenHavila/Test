@@ -1,0 +1,16 @@
+<!-- fournisseurs/partials/categories_select.html -->
+<label for="id_categories">Catégories</label>
+<select name="categories" id="id_categories" multiple>
+    {% for cat in sous_categories %}
+        <option value="{{ cat.id }}">{{ cat.nom }}</option>
+    {% endfor %}
+</select>
+
+
+<!-- fournisseurs/partials/specialites_select.html -->
+<label for="id_categories">Spécialité</label>
+<select name="categories" id="id_categories" multiple class="form-select">
+    {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name }}</option>
+    {% endfor %}
+</select>

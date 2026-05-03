@@ -1,0 +1,55 @@
+{% for service in services %}
+<tr id="service-{{ service.id }}">
+    <td class="text-truncate">
+        <a href="#"
+           hx-get="{% url 'catalogue:detail-service' service.id %}"
+           hx-target="#modal-body"
+           hx-swap="innerHTML"
+           @click="$dispatch('open-modal')">
+            {{ service.reference }}
+        </a>
+    </td>
+    <td class="text-truncate">{{ service.categorie|default:"-" }}</td>
+    <td class="text-truncate">{{ service.designation }}</td>
+    <td class="text-truncate">
+        <span class="badge 
+            {% if service.frequence == 'hebdomadaire' %}bg-success
+            {% elif service.frequence == 'mensuel' %}bg-info
+            {% elif service.frequence == 'annuel' %}bg-warning text-dark
+            {% elif service.frequence == 'ponctuel' %}bg-secondary
+            {% else %}bg-light text-dark{% endif %}">
+            {{ service.get_frequence_display|default:"-" }}
+        </span>
+    </td>
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-1">
+            <button type="button"
+                    class="btn btn-info btn-sm"
+                    hx-get="{% url 'catalogue:detail-service' service.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button type="button"
+                    class="btn btn-warning btn-sm"
+                    hx-get="{% url 'catalogue:modifier-service' service.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            {% include "components/delete_button.html" with delete_url=service.get_delete_url target_id=service.get_target_id message="Voulez-vous supprimer ce service ?" %}
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5" class="text-center text-muted py-3">
+        <i class="bi bi-inbox d-block mb-1"></i>
+        Aucun service trouvé
+    </td>
+</tr>
+{% endfor %}

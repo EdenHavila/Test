@@ -1,0 +1,191 @@
+{% load crispy_forms_tags %}
+
+<div class="mon-bootstrap p-3">
+    {# En-tête avec infos principales #}
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h5 class="mb-1">
+                <i class="bi bi-box-seam me-2"></i>
+                Stock {{ stock.code }}
+            </h5>
+            <span class="badge 
+                {% if stock.statut_bien == 'disponible' %}bg-success
+                {% elif stock.statut_bien == 'indisponible' %}bg-danger
+                {% else %}bg-secondary{% endif %}">
+                {{ stock.get_statut_bien_display|default:"Non défini" }}
+            </span>
+            {% if stock.alerte_stock %}
+                <span class="badge bg-warning text-dark ms-1">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Alerte stock
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Informations du bien #}
+    <h6 class="mb-3">
+        <i class="bi bi-tag me-2"></i>
+        Informations du bien
+    </h6>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Désignation</small>
+                    <strong>{{ stock.bien.designation }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Code du bien</small>
+                    <strong>{{ stock.bien.code|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Quantités et localisation #}
+    <h6 class="mb-3">
+        <i class="bi bi-graph-up me-2"></i>
+        Quantités et Localisation
+    </h6>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 {% if stock.alerte_stock %}bg-warning bg-opacity-25{% else %}bg-light{% endif %}">
+                <div class="card-body py-2 text-center">
+                    <small class="text-muted d-block">Quantité disponible</small>
+                    <strong class="fs-3 {% if stock.alerte_stock %}text-warning{% else %}text-primary{% endif %}">
+                        {{ stock.quantite_disponible }}
+                    </strong>
+                    <small class="d-block">{{ stock.get_unite_display }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2 text-center">
+                    <small class="text-muted d-block">Seuil d'alerte</small>
+                    <strong class="fs-3 text-danger">{{ stock.niveau_alerte }}</strong>
+                    <small class="d-block">{{ stock.get_unite_display }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2 text-center">
+                    <small class="text-muted d-block">Lieu de stockage</small>
+                    <strong class="fs-5">{{ stock.get_lieu_stockage_display }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Responsable et dates #}
+    <h6 class="mb-3">
+        <i class="bi bi-person me-2"></i>
+        Gestion
+    </h6>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Responsable du stock</small>
+                    <strong>
+                        {% if stock.responsable_stock %}
+                            {{ stock.responsable_stock.first_name }} {{ stock.responsable_stock.last_name|default:stock.responsable_stock.username }}
+                        {% else %}
+                            Non assigné
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Dernière mise à jour</small>
+                    <strong>{{ stock.date_mise_a_jour|date:"d/m/Y H:i"|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Historique des mouvements récents #}
+    <h6 class="mb-3">
+        <i class="bi bi-clock-history me-2"></i>
+        Derniers mouvements ({{ mouvements.count }})
+    </h6>
+    
+    {% if mouvements %}
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th class="text-end">Quantité</th>
+                    <th>Date</th>
+                    <th>Responsable</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mvt in mouvements %}
+                <tr>
+                    <td>{{ mvt.code }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if mvt.type_mouvement == 'ENT' %}bg-success
+                            {% elif mvt.type_mouvement == 'SOR' %}bg-danger
+                            {% elif mvt.type_mouvement == 'TRF' %}bg-info
+                            {% elif mvt.type_mouvement == 'RET' %}bg-warning text-dark
+                            {% else %}bg-secondary{% endif %}">
+                            {{ mvt.get_type_mouvement_display }}
+                        </span>
+                    </td>
+                    <td class="text-end">{{ mvt.quantite }}</td>
+                    <td>{{ mvt.date_mouvement|date:"d/m/Y H:i" }}</td>
+                    <td>{{ mvt.responsable.username|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-3">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        Aucun mouvement enregistré pour ce stock
+    </div>
+    {% endif %}
+
+    {# État du stock #}
+    <div class="mt-4 p-3 border rounded {% if stock.alerte_stock %}border-warning bg-warning bg-opacity-10{% elif stock.statut_bien == 'indisponible' %}border-danger bg-danger bg-opacity-10{% else %}border-success bg-success bg-opacity-10{% endif %}">
+        <div class="d-flex align-items-center">
+            {% if stock.statut_bien == 'indisponible' %}
+                <i class="bi bi-x-circle-fill text-danger fs-4 me-3"></i>
+                <div>
+                    <strong class="text-danger">Stock indisponible</strong>
+                    <p class="mb-0 small">Ce stock est actuellement indisponible (quantité à zéro)</p>
+                </div>
+            {% elif stock.alerte_stock %}
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-4 me-3"></i>
+                <div>
+                    <strong class="text-warning">Attention - Stock bas</strong>
+                    <p class="mb-0 small">
+                        La quantité ({{ stock.quantite_disponible }}) est inférieure ou égale au seuil d'alerte ({{ stock.niveau_alerte }})
+                    </p>
+                </div>
+            {% else %}
+                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                <div>
+                    <strong class="text-success">Stock normal</strong>
+                    <p class="mb-0 small">Le niveau de stock est satisfaisant</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

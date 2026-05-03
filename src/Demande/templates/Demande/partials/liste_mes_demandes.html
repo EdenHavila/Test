@@ -1,0 +1,67 @@
+
+{% for demande in demandes %}
+<tr id="demande-{{ demande.id }}">
+    <td class="text-truncate">
+        <a href="#"
+           hx-get="{% url 'Demande:detail-demande' demande.id %}"
+           hx-target="#modal-body"
+           hx-swap="innerHTML"
+           @click="$dispatch('open-modal')">
+            {{demande.code_demande}}
+        </a>
+    </td>
+    <td class="text-truncate">
+        <span class="badge {% if demande.nature_demande == 'Bien' %}bg-info{% else %}bg-purple{% endif %}">
+            {{demande.nature_demande}}
+        </span>
+    </td>
+    <td class="text-truncate">{{demande.date_demande|date:"d/m/Y"}}</td>
+    <td class="text-truncate">{{demande.motif_demande|truncatechars:30}}</td>
+    <td class="text-truncate">
+        <span class="badge 
+            {% if demande.statut_demande == 'En cours' %}bg-warning text-dark
+            {% elif demande.statut_demande == 'Validée' %}bg-success
+            {% elif demande.statut_demande == 'Rejetée' %}bg-danger
+            {% elif demande.statut_demande == 'Traitement' %}bg-info
+            {% elif demande.statut_demande == 'Traitée' %}bg-primary
+            {% else %}bg-secondary{% endif %}">
+            {{demande.statut_demande}}
+        </span>
+    </td>
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-2">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    hx-get="{% url 'Demande:detail-demande' demande.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir détails">
+                    <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier : visible seulement si statut = En cours #}
+            {% if demande.statut_demande == 'En cours' %}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'Demande:modifier-demande' demande.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier" >
+                    <i class="bi bi-pencil"></i>
+            </button>
+            {% endif %}
+        </div>
+    </td>
+  
+</tr>
+{% empty %}
+<tr>
+    <td colspan="6" class="text-center text-muted py-4">
+        <i class="bi bi-inbox d-block mb-2" style="font-size: 2rem;"></i>
+        Vous n'avez pas encore de demandes
+    </td>
+</tr>
+{% endfor %}

@@ -1,0 +1,131 @@
+{% load static %}
+
+          <div class="container">
+            <!-- Navigation avec titre et recherche -->
+            <nav class="page-header">
+              <div class="header-left">
+                <div class="burger-menu"><i class="bi bi-list"></i></div>
+                <h1 class="page-title">Mes Demandes</h1>
+              </div>
+
+              <div class="header-right">
+                <div class="search-box">
+                  <ion-icon name="search-outline"></ion-icon>
+                  <input type="search" 
+                         name="q" 
+                         id="search-mes-demandes"
+                         placeholder="Rechercher par code ou motif..." 
+                         hx-get="{% url 'Demande:mes-demandes-liste' %}"
+                         hx-trigger="keyup changed delay:300ms"
+                         hx-target="#liste-mes-demandes"
+                         hx-include="[name='nature_demande'], [name='statut_demande'], [name='date_debut'], [name='date_fin']"
+                         autocomplete="off" />
+                </div>
+
+                <div class="user">
+                  <div class="avatar">
+                    <img src="{% static 'ressources/1.png' %}" alt="" width="50" />
+                  </div>
+                </div>
+              </div>
+            </nav>
+
+            <!-- Barre de filtres contextuels -->
+            <div class="filter-bar">
+              <div class="filter">
+                <div class="filter-item">
+                  <label for="filter-nature">Nature :</label>
+                  <select name="nature_demande" id="filter-nature"
+                          hx-get="{% url 'Demande:mes-demandes-liste' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-mes-demandes"
+                          hx-include="[name='q'], [name='statut_demande'], [name='date_debut'], [name='date_fin']">
+                    <option value="">Tous</option>
+                    <option value="Bien">Bien</option>
+                    <option value="Service">Service</option>
+                  </select>
+                </div>
+
+                <div class="filter-item">
+                  <label for="filter-statut">Statut :</label>
+                  <select name="statut_demande" id="filter-statut"
+                          hx-get="{% url 'Demande:mes-demandes-liste' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-mes-demandes"
+                          hx-include="[name='q'], [name='nature_demande'], [name='date_debut'], [name='date_fin']">
+                    <option value="">Tous</option>
+                    <option value="En cours">En cours</option>
+                    <option value="Validée">Validée</option>
+                    <option value="Rejetée">Rejetée</option>
+                    <option value="Traitement">Traitement</option>
+                    <option value="Traitée">Traitée</option>
+                  </select>
+                </div>
+
+                <div class="filter-item filter-date">
+                  <label for="filter-date-debut">Du :</label>
+                  <input type="date" name="date_debut" id="filter-date-debut"
+                         hx-get="{% url 'Demande:mes-demandes-liste' %}"
+                         hx-trigger="change"
+                         hx-target="#liste-mes-demandes"
+                         hx-include="[name='q'], [name='nature_demande'], [name='statut_demande'], [name='date_fin']" />
+                </div>
+
+                <div class="filter-item filter-date">
+                  <label for="filter-date-fin">Au :</label>
+                  <input type="date" name="date_fin" id="filter-date-fin"
+                         hx-get="{% url 'Demande:mes-demandes-liste' %}"
+                         hx-trigger="change"
+                         hx-target="#liste-mes-demandes"
+                         hx-include="[name='q'], [name='nature_demande'], [name='statut_demande'], [name='date_debut']" />
+                </div>
+
+                <div class="filter-actions">
+                  <button type="button" class="btn-reset" 
+                          onclick="resetFilters('mes-demandes')"
+                          title="Réinitialiser les filtres">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="content">
+              <div class="card">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+
+                        <tr>
+                            <th class="text-truncate">Code</th>
+                            <th class="text-truncate">Nature</th>
+                            <th class="text-truncate">Date demande</th>
+                            <th class="text-truncate">Motif</th>
+                            <th class="text-truncate">Statut</th>
+                            <th class="text-truncate">Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="liste-mes-demandes" hx-get="{% url 'Demande:mes-demandes-liste' %}" hx-trigger="load, refresh-messages from:body" hx-swap="innerHTML">
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% block modal_request %}
+<div class="modal_request">
+    <button class="new_request"
+            hx-get="{% url 'Demande:ajouter-demande' %}"
+            hx-target="#modal-body"
+            hx-swap="innerHTML"
+            @click="$dispatch('open-modal')">
+        Nouvelle demande
+        <ion-icon name="add-circle-outline"></ion-icon>
+    </button>
+</div>
+
+{% endblock modal_request %}

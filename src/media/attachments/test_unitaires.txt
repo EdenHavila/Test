@@ -1,0 +1,28 @@
+#####################TEST UNITAIRES#############################
+tester automatiquement le code pour voir s'il fonctionne comme prevu
+BIBLIOTHEQUE:
+unittest:inclut par defaut
+pytest:le plus utilisé dans le moinde pro
+
+
+##pourquoi tester notre code?
+pour verifier si notre code va tjrs fonctionner de la bonne facon
+
+##ou placer les test
+ideal de les placer dans 
+-un dossier appelé test
+-les fichiers test :test_nomDuFichierTest
+
+
+
+
+
+
+
+
+
+
+
+
+
+tester nos codes pour preveni

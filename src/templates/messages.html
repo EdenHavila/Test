@@ -1,0 +1,123 @@
+
+<!-- le template des messages utilisés apres la soumission des formulaires -->
+
+
+<!-- sans htmx+alpine(avec django messages uniquement) -->
+<!-- {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} text-center my-2">
+        {{ message }}
+    </div>
+  {% endfor %}
+{% endif %} -->
+
+
+<!-- avec htmx+alpine -->
+  <!-- <div
+    x-data="{show: true}"
+    x-init="setTimeout(() => show = false, 2000)"
+    x-show="show"
+    x-transition.duration.4000ms
+    class="position-fixed top-0 start-50 translate-middle-x"
+    style="z-index: 99999;"
+>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast show align-items-center text-bg-{{ message.tags }} border-0 mb-2 shadow
+                        {% if message.tags == 'success' %}text-bg-success
+                        {% elif message.tags == 'danger' or message.tags == 'error' %}text-bg-danger
+                        {% elif message.tags == 'warning' %}text-bg-warning
+                        {% elif message.tags == 'info' %}text-bg-info
+                        {% else %}text-bg-light{% endif %}" >
+                <div class="d-flex">
+                    <div class="toast-body" >
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" @click="show=false"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+ <-------------------------------------- -->
+
+
+
+
+
+<div
+    x-data="{show: true}"
+    x-init="setTimeout(() => show = false, 2000)"
+    x-show="show"
+    x-transition.duration.4000ms
+    class="position-fixed top-0 start-50 translate-middle-x"
+    style="z-index: 99999;"
+>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast d-flex align-items-center border-0 mb-2 shadow
+                        {% if message.tags == 'success' %}text-bg-success
+                        {% elif message.tags == 'danger' or message.tags == 'error' %}text-bg-danger
+                        {% elif message.tags == 'warning' %}text-bg-warning
+                        {% elif message.tags == 'info' %}text-bg-info
+                        {% else %}text-bg-light{% endif %}">
+                <div class="toast-body d-flex align-items-center justify-content-between">
+                    <!-- Icône sobre selon type  -->
+                     <div>
+                    {% if message.tags == 'success' %}
+                        <svg class="bi bi-check-circle-fill me-2" width="20" height="20" fill="currentColor">
+                            <use xlink:href="#check-circle-fill"/>
+                        </svg>
+                    {% elif message.tags == 'danger' or message.tags == 'error' %}
+                        <svg class="bi bi-exclamation-triangle-fill me-2" width="20" height="20" fill="currentColor">
+                            <use xlink:href="#exclamation-triangle-fill"/>
+                        </svg>
+                    {% elif message.tags == 'warning' %}
+                        <svg class="bi bi-exclamation-circle-fill me-2" width="20" height="20" fill="currentColor">
+                            <use xlink:href="#exclamation-circle-fill"/>
+                        </svg>
+                    {% elif message.tags == 'info' %}
+                        <svg class="bi bi-info-circle-fill me-2" width="20" height="20" fill="currentColor">
+                            <use xlink:href="#info-circle-fill"/>
+                        </svg>
+                    {% endif %}
+
+                    {{ message }}
+                    </div>
+                    <!-- Bouton de fermeture -->
+                    <button type="button" class="btn-close ms-2" @click="show=false" aria-label="Fermer"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Icônes SVG à mettre dans base.html une seule fois -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.97 11.03l-3.47-3.47 1.06-1.06L6.97 8.91l4.95-4.95 1.06 1.06-6.01 6.01z"/>
+    </symbol>
+    <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 0c.69 0 1.37.28 1.88.81l6.29 6.29c.53.53.81 1.23.81 1.88 0 .69-.28 1.37-.81 1.88l-6.29 6.29c-.53.53-1.23.81-1.88.81-.69 0-1.37-.28-1.88-.81L.81 11.86A2.656 2.656 0 0 1 0 9.98c0-.69.28-1.37.81-1.88L7.12.81A2.656 2.656 0 0 1 8 0zM7 5h2v4H7V5zm0 5h2v2H7v-2z"/>
+    </symbol>
+    <symbol id="exclamation-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM7 4h2v5H7V4zm0 6h2v2H7v-2z"/>
+    </symbol>
+    <symbol id="info-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 0A8 8 0 1 0 8 16A8 8 0 0 0 8 0zM8 4a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM7 7h2v5H7V7z"/>
+    </symbol>
+</svg>
+
+
+
+                    <!-- Icône Bootstrap -->
+                    <!-- {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                    {% elif message.tags == 'danger' or message.tags == 'error' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    {% elif message.tags == 'info' %}
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                    {% endif %} -->

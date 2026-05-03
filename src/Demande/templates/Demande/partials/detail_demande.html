@@ -1,0 +1,206 @@
+{% load crispy_forms_tags %}
+
+<div class="mon-bootstrap p-3">
+    {# En-tête avec infos principales #}
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h5 class="mb-1">
+                <i class="bi bi-file-text me-2"></i>
+                Demande {{ demande.code_demande }}
+            </h5>
+            <span class="badge 
+                {% if demande.statut_demande == 'En cours' %}bg-warning text-dark
+                {% elif demande.statut_demande == 'Validée' %}bg-success
+                {% elif demande.statut_demande == 'Rejetée' %}bg-danger
+                {% elif demande.statut_demande == 'Traitement' %}bg-info
+                {% elif demande.statut_demande == 'Traitée' %}bg-primary
+                {% else %}bg-secondary{% endif %}">
+                {{ demande.statut_demande }}
+            </span>
+            <span class="badge ms-1 {% if demande.type_demande == 'Gestionnaire' %}bg-purple{% else %}bg-info{% endif %}">
+                {{ demande.type_demande }}
+            </span>
+        </div>
+    </div>
+
+    {# Informations de la demande #}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Nature de la demande</small>
+                    <strong>{{ demande.nature_demande|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Date de la demande</small>
+                    <strong>{{ demande.date_demande|date:"d/m/Y" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Motif de la demande</small>
+                    <p class="mb-0">{{ demande.motif_demande|default:"-" }}</p>
+                    {% if demande.fichier_joint %}
+                    <div class="mt-2">
+                        <small class="text-muted d-block">Fichier joint</small>
+                        <a href="{{ demande.fichier_joint.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download me-1"></i> Télécharger le fichier
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Section Demandes Regroupées (uniquement pour type Gestionnaire) #}
+    {% if demande.type_demande == 'Gestionnaire' and demandes_associees %}
+    <div class="mb-4">
+        <h6 class="mb-3">
+            <i class="bi bi-collection me-2"></i>
+            Demandes regroupées ({{ demandes_associees.count }})
+        </h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Code</th>
+                        <th>Nature</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Motif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dem in demandes_associees %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="#" 
+                               hx-get="{% url 'Demande:detail-demande' dem.pk %}"
+                               hx-target="#modal-body"
+                               hx-swap="innerHTML"
+                               @click="$dispatch('open-modal')">
+                                {{ dem.code_demande }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge {% if dem.nature_demande == 'Bien' %}bg-info{% else %}bg-purple{% endif %}">
+                                {{ dem.nature_demande }}
+                            </span>
+                        </td>
+                        <td>{{ dem.date_demande|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if dem.statut_demande == 'En cours' %}bg-warning text-dark
+                                {% elif dem.statut_demande == 'Validée' %}bg-success
+                                {% elif dem.statut_demande == 'Rejetée' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ dem.statut_demande }}
+                            </span>
+                        </td>
+                        <td>{{ dem.motif_demande|truncatechars:30 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Section Regroupée par (si demande de type Demandeur regroupée) #}
+    {% if demande.type_demande == 'Demandeur' and regroupee_par %}
+    <div class="mb-4">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Cette demande est regroupée dans :
+            {% for dem_gest in regroupee_par %}
+                <a href="#" 
+                   hx-get="{% url 'Demande:detail-demande' dem_gest.pk %}"
+                   hx-target="#modal-body"
+                   hx-swap="innerHTML"
+                   @click="$dispatch('open-modal')"
+                   class="fw-bold">
+                    {{ dem_gest.code_demande }}
+                </a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Tableau des lignes de détails de la demande #}
+    <h6 class="mb-3">
+        <i class="bi bi-list-ul me-2"></i>
+        Détail des articles ({{ lignes.count }})
+    </h6>
+    
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Type</th>
+                    <th>Désignation</th>
+                    <th class="text-end">Quantité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in lignes %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <span class="badge {% if ligne.type == 'Bien' %}bg-info{% else %}bg-purple{% endif %}">
+                            {{ ligne.type }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if ligne.type == 'Bien' and ligne.bien %}
+                            {{ ligne.bien.designation }}
+                        {% elif ligne.type == 'Service' and ligne.service %}
+                            {{ ligne.service.designation }}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">{{ ligne.quantite }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-3">
+                        <i class="bi bi-inbox d-block mb-1"></i>
+                        Aucune ligne de détail
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Pied de page avec dates #}
+    <div class="mt-4 pt-3 border-top">
+        <div class="row">
+            <div class="col-md-6">
+                <small class="text-muted">
+                    <i class="bi bi-calendar-plus me-1"></i>
+                    <strong>Date d'enregistrement :</strong> {{ demande.date_enregistrement|date:"d/m/Y à H:i" }}
+                </small>
+            </div>
+            <div class="col-md-6">
+                <small class="text-muted">
+                    <i class="bi bi-calendar-check me-1"></i>
+                    <strong>Dernière modification :</strong> {{ demande.date_mise_a_jour|date:"d/m/Y à H:i" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

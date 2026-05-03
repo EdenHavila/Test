@@ -1,0 +1,83 @@
+{% comment %} Fragment pour une ligne de DetailsDemande à cloner dynamiquement avec htmx ou JS {% endcomment %}
+
+
+{% load crispy_forms_tags %}
+
+<div class="formset-item card mb-2 p-3 border bg-light" id="ligne-{{ form_idx }}">
+    <div class="d-flex flex-row align-items-end gap-2 flex-nowrap">
+        <!-- Type -->
+        <div class="flex-grow-1" style="min-width: 180px;">
+            {{ form.type|as_crispy_field }}
+        </div>
+        <!-- Bien/Service côte à côte, toujours sur la même ligne -->
+        <div class="d-flex flex-row flex-grow-2 gap-2" style="min-width: 320px;">
+            <div class="field-bien-wrapper flex-fill" style="{% if form.type.value != 'Bien' %}display:none; {% endif %}">
+                {{ form.bien|as_crispy_field }}
+            </div>
+            <div class="field-service-wrapper flex-fill" style="{% if form.type.value != 'Service' %}display:none;{% endif %}">
+                {{ form.service|as_crispy_field }}
+            </div>
+        </div>
+        <!-- Quantité -->
+        <div class="flex-grow-1" style="min-width: 120px;">
+            {{ form.quantite|as_crispy_field }}
+        </div>
+        <!-- Supprimer -->
+        <div class="d-flex align-items-end mb-3" style="min-width: 80px;">
+            {% if form.DELETE %}
+                <input type="hidden" name="{{ form.DELETE.html_name }}" value="" class="delete-checkbox">
+            {% endif %}
+            <button type="button" class="btn btn-outline-danger w-100" onclick="supprimerLigne(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    {% if form.instance.pk %}
+        <input type="hidden" name="{{ form.prefix }}-id" value="{{ form.instance.pk }}">
+    {% endif %}
+</div>
+<script>
+// Affichage dynamique des champs Bien/Service selon le type sélectionné
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.matches('[name$="-type"]')) {
+        const row = e.target.closest('.formset-item');
+        const bien = row.querySelector('.field-bien-wrapper');
+        const service = row.querySelector('.field-service-wrapper');
+        if (e.target.value === 'Bien') {
+            if (bien) bien.style.display = '';
+            if (service) service.style.display = 'none';
+        } else if (e.target.value === 'Service') {
+            if (bien) bien.style.display = 'none';
+            if (service) service.style.display = '';
+        } else {
+            if (bien) bien.style.display = 'none';
+            if (service) service.style.display = 'none';
+        }
+    }
+});
+function supprimerLigne(btn) {
+    const ligne = btn.closest('.formset-item');
+    const deleteInput = ligne.querySelector('.delete-checkbox');
+    if (deleteInput) {
+        deleteInput.value = 'on';
+        ligne.style.display = 'none';
+    } else {
+        ligne.remove();
+    }
+    // Optionnel : mettre à jour le management form si besoin
+}
+</script>
+
+<script>
+function supprimerLigne(btn) {
+    const ligne = btn.closest('.formset-item');
+    const deleteInput = ligne.querySelector('.delete-checkbox');
+    if (deleteInput) {
+        deleteInput.value = 'on';
+        ligne.style.display = 'none';
+    } else {
+        ligne.remove();
+    }
+    // Optionnel : mettre à jour le management form si besoin
+}
+</script>

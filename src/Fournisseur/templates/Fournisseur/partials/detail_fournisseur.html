@@ -1,0 +1,183 @@
+{% load crispy_forms_tags %}
+
+<div class="mon-bootstrap p-3">
+    {# En-tête avec infos principales #}
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h5 class="mb-1">
+                <i class="bi bi-building me-2"></i>
+                {{ fournisseur.nom }}
+            </h5>
+            <span class="text-muted">{{ fournisseur.reference }}</span>
+        </div>
+    </div>
+
+    {# Informations de contact #}
+    <h6 class="mb-3">
+        <i class="bi bi-person-lines-fill me-2"></i>
+        Informations de contact
+    </h6>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">
+                        <i class="bi bi-envelope me-1"></i> Email
+                    </small>
+                    {% if fournisseur.email %}
+                        <a href="mailto:{{ fournisseur.email }}" class="text-decoration-none">
+                            <strong>{{ fournisseur.email }}</strong>
+                        </a>
+                    {% else %}
+                        <strong class="text-muted">Non renseigné</strong>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">
+                        <i class="bi bi-telephone me-1"></i> Téléphone
+                    </small>
+                    {% if fournisseur.telephone %}
+                        <a href="tel:{{ fournisseur.telephone }}" class="text-decoration-none">
+                            <strong>{{ fournisseur.telephone }}</strong>
+                        </a>
+                    {% else %}
+                        <strong class="text-muted">Non renseigné</strong>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">
+                        <i class="bi bi-geo-alt me-1"></i> Adresse
+                    </small>
+                    <strong>{{ fournisseur.adresse|default:"Non renseignée" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Types de fournisseur #}
+    <h6 class="mb-3">
+        <i class="bi bi-tags me-2"></i>
+        Types
+    </h6>
+    
+    <div class="mb-4">
+        {% for type in fournisseur.types.all %}
+            <span class="badge {% if type.nom == 'Bien' %}bg-info{% elif type.nom == 'Service' %}bg-purple{% else %}bg-secondary{% endif %} me-1">
+                {{ type.nom }}
+            </span>
+        {% empty %}
+            <span class="text-muted">Aucun type défini</span>
+        {% endfor %}
+    </div>
+
+    {# Spécialités #}
+    <h6 class="mb-3">
+        <i class="bi bi-list-check me-2"></i>
+        Spécialités ({{ fournisseur.specialite.count }})
+    </h6>
+    
+    {% if fournisseur.specialite.exists %}
+    <div class="row mb-4">
+        {% for spec in fournisseur.specialite.all %}
+        <div class="col-md-6 col-lg-4 mb-2">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2 px-3">
+                    <i class="bi bi-check-circle text-success me-1"></i>
+                    {{ spec.nom }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-3 mb-4">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        Aucune spécialité définie
+    </div>
+    {% endif %}
+
+    {# Commandes récentes #}
+    {% if commandes %}
+    <h6 class="mb-3">
+        <i class="bi bi-cart me-2"></i>
+        Dernières commandes ({{ commandes.count }})
+    </h6>
+    
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th class="text-end">Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cmd in commandes %}
+                <tr>
+                    <td>{{ cmd.code_cmnd }}</td>
+                    <td>{{ cmd.date_cmnd|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if cmd.statut_cmnd == 'en_cours' %}bg-warning text-dark
+                            {% elif cmd.statut_cmnd == 'terminee' %}bg-success
+                            {% elif cmd.statut_cmnd == 'annulee' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ cmd.get_statut_cmnd_display }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        {% if cmd.montant_total %}
+                            {{ cmd.montant_total|floatformat:0 }} FCFA
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {# Indicateur de statut #}
+    <div class="mt-4 p-3 border rounded 
+        {% if fournisseur.statut == 'Actif' %}border-success bg-success bg-opacity-10
+        {% elif fournisseur.statut == 'Suspendu' %}border-warning bg-warning bg-opacity-10
+        {% else %}border-danger bg-danger bg-opacity-10{% endif %}">
+        <div class="d-flex align-items-center">
+            {% if fournisseur.statut == 'Actif' %}
+                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                <div>
+                    <strong class="text-success">Fournisseur actif</strong>
+                    <p class="mb-0 small">Ce fournisseur est disponible pour les commandes</p>
+                </div>
+            {% elif fournisseur.statut == 'Suspendu' %}
+                <i class="bi bi-pause-circle-fill text-warning fs-4 me-3"></i>
+                <div>
+                    <strong class="text-warning">Fournisseur suspendu</strong>
+                    <p class="mb-0 small">Ce fournisseur est temporairement indisponible</p>
+                </div>
+            {% else %}
+                <i class="bi bi-x-circle-fill text-danger fs-4 me-3"></i>
+                <div>
+                    <strong class="text-danger">Fournisseur inactif</strong>
+                    <p class="mb-0 small">Ce fournisseur n'est plus disponible</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

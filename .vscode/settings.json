@@ -1,0 +1,10 @@
+{
+  // 📁 Définir le dossier de démarrage du terminal
+  "terminal.integrated.cwd": "${workspaceFolder}/src",
+
+  
+  // 🧠 Activer l'autocomplétion intelligente
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.useLibraryCodeForTypes": true,
+}
+

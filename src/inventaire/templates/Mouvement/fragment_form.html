@@ -1,0 +1,48 @@
+{% load crispy_forms_tags %}
+
+<div class="form-container">
+    <div class="form-header">
+        <h4 class="form-title">
+            <i class="bi bi-{% if mouvement %}pencil-square{% else %}plus-circle{% endif %} me-2"></i>
+            {% if mouvement %}Modifier ce{% else %}Enregistrer un{% endif %} mouvement
+        </h4>
+        <p class="form-subtitle text-muted mb-0">
+            {% if mouvement %}Modifiez les informations du mouvement{% else %}Enregistrez un nouveau mouvement logistique{% endif %}
+        </p>
+    </div>
+    
+    <hr class="my-3">
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {% for error in form.non_field_errors %}
+            <span>{{ error }}</span>
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <form method="post"
+          enctype="multipart/form-data"
+          hx-post="{% if is_editing %}{% url 'inventaire:modifier-mouvement' mouvement.id %}{% else %}{% url 'inventaire:ajouter-mouvement' %}{% endif %}"
+          hx-target="#modal-body"
+          hx-swap="innerHTML"
+          class="needs-validation">
+        {% csrf_token %}
+        {{ form.media }}
+        
+        {% crispy form %}
+        
+        <div class="form-actions mt-4 pt-3 border-top">
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="document.querySelector('.modal').classList.remove('active')">
+                    <i class="bi bi-x-lg me-1"></i> Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-{% if mouvement %}check-lg{% else %}plus-lg{% endif %} me-1"></i> {{ button_text }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

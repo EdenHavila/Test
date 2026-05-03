@@ -1,0 +1,85 @@
+{% load static %}
+
+          <div class="container">
+            <nav>
+              <div class="burger-menu"><i class="bi bi-list"></i></div>
+
+              <div class="navbar-right">
+                <div class="search-bar">
+                  <ion-icon name="search-outline"></ion-icon>
+                  <input type="text" placeholder="Search" />
+                </div>
+
+                <div class="user">
+                  <div class="avatar">
+                    <img src="{% static 'ressources/1.png' %}" alt="" width="50" />
+                  </div>
+                </div>
+              </div>
+            </nav>
+
+            <div class="filter-bar">
+              <div class="filter">
+                <div class="filter-item-society">
+                  <label for="filter">Filtrer par société:</label>
+                  <select name="filter" id="filter">
+                    <option value="all">Tous</option>
+                    <option value="pending">Pigier</option>
+                    <option value="treated">Pigier</option>
+                  </select>
+                </div>
+
+                <div class="filter-item-diplome">
+                  <label for="filter">Filtrer par diplôme:</label>
+                  <select name="filter" id="filter">
+                    <option value="all">Tous</option>
+                    <option value="pending">BTS</option>
+                    <option value="pending">LICENCE</option>
+                    <option value="treated">MASTER</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="content">
+              <div class="card">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+
+                        <tr>
+                            <th class="text-truncate">Reference</th>
+                            <th class="text-truncate">Nom</th>
+                            <th class="text-truncate">Mail</th>
+                            <th class="text-truncate">Telephone</th>
+                            <th class="text-truncate">Specialité</th>
+                            <th class="text-truncate">Statut</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for fournisseur in fournisseurs %}
+                        <tr>
+                            <td class="text-truncate">{{fournisseur.reference}}</td>
+                            <td class="text-truncate">{{fournisseur.nom}}</td>
+                            <td class="text-truncate">{{fournisseur.mail}}</td>
+                            <td class="text-truncate">{{fournisseur.telephone}}</td>
+                            <td class="text-truncate">{{fournisseur.specialite}}</td>
+                            <td class="text-truncate">{{fournisseur.statut}}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% block modal_request %}
+     <div class="modal_request">
+        <button class="new_request">
+          Ajouter un fournisseur
+          <ion-icon name="add-circle-outline"></ion-icon>
+     </div>
+{% endblock modal_request %}

@@ -1,0 +1,148 @@
+****************************************************** Interview *************************************************************
+*La cybersécurité désigne l’ensemble des pratiques, technologies et processus mis en place pour protéger les systèmes informatiques, les réseaux, les données et les utilisateurs contre les attaques numériques,
+
+*Hacking: c'est le fait de detourner un système de son utilisation initiale
+
+**UN HACKER:est quelqu'un qui parvient à détourner un objet de son utilisation
+initiale pour lui faire accomplir ce qu'il veut.
+
+*Le hacking informatique: consiste à détourner un système informatique de
+son utilisation initiale pour lui faire faire ce que l’on veut. Cela peut être
+absolument n’importe quoi.
+
+*Un test d'intrusion consiste a identifier les vulnérabilités potentielles dans le système informatique.
+
+*Un test d'intrusion est réalisé par un pentester afin de simuler une attaque
+semblable à celle qu'un black hat pourrait mener. L'objectif est d'identifier
+les vulnérabilités potentielles dans le système informatique
+
+*un bot est une application qui permet d'être contrôler a distance pour automatiser une attaque depuis l'exterieur
+
+****les grandes phases de l'hacking
+_la phase de  reconnaissance: consiste a récupérer le plus d'informations possible
+_l'attaque d'acces
+_exploitation
+
+
+------------------------------------------------------------------------------
+que ferais tu si tu decovrais un port ouvert en tant que admin d'un reseau
+------------------------------------------------------------------------------
+*Ne panique pas: car u port ouvert n'est pas forcement malveillant en soi(on n'a peu etre un service qui tourne et autres)
+*Identifier l’hôte : note l’adresse IP, le nom de l’équipement, l’emplacement réseau et quel service semble associé.
+*Isoler si nécessaire : si l’hôte montre des signes de compromission (trafic anormal, connexions inconnues), place-le en quarantaine réseau ou restreins son accès pendant l’investigation.
+*Collecter des preuves : conserve les logs (firewall, routeur, hôte), captures réseau, horodatage — sans les écraser.
+
+
+
+------------------------------------------------------------------------------
+comment exliuer le hacking à un enfant
+------------------------------------------------------------------------------
+Le hacking, c’est quand quelqu’un essaie d’entrer dans un ordinateur ou un compte sans y être invité, un peu comme entrer dans une maison sans la permission.
+
+Histoire imagée
+
+Imagine ta maison :
+
+*Ta porte = ton mot de passe.
+*Tes jouets = tes photos, tes jeux, tes messages.
+*Un mauvais voleur (hackeur méchant) essaie d’ouvrir ta porte pour voler tes jouets.
+*Un bon détective (hackeur gentil) essaie d’ouvrir la porte pour montrer au propriétaire ce qui est cassé, puis dit quoi réparer pour être plus sûr.
+*Les deux savent « comment entrer », mais le bon détective aide, et le voleur fait du mal.
+
+
+------------------------------------------------------------------------------
+Qu’est-ce qu’un proxy ?
+------------------------------------------------------------------------------
+
+Imagine que tu veux envoyer une lettre à un ami, mais au lieu de l’envoyer directement, tu donnes la lettre à un intermédiaire qui va la transmettre pour toi. Ce facteur intermédiaire, c’est un peu comme un proxy.
+
+En informatique, un proxy c’est quoi ?
+C’est un serveur ou un logiciel qui agit comme un intermédiaire entre ton ordinateur (ou ton navigateur) et internet.
+Quand tu demandes une page web, ta requête passe d’abord par le proxy.
+Le proxy va ensuite demander la page au serveur web, la récupérer, puis te la renvoyer.
+
+------------------------------------------------------------------------------
+Burp Suite
+------------------------------------------------------------------------------
+Burp Suite est un ensemble d’outils très utilisé par les pentesters pour tester la sécurité des applications web.
+
+
+------------------------------------------------------------------------------
+Nikto
+------------------------------------------------------------------------------
+Nikto est un scanner web open source simple mais efficace, conçu pour repérer rapidement des problèmes de sécurité sur des serveurs web.Scanne un site / serveur web pour centaines de vulnérabilités connues
+
+------------------------------------------------------------------------------
+Option-A de nmap
+------------------------------------------------------------------------------
+L'option -A dans Nmap active ce qu'on appelle un scan avancé.
+C’est comme dire à Nmap :
+
+“Fais ton maximum pour récolter un maximum d’infos utiles sur la cible.”
+------------------------------------------------------------------------------
+Phising
+------------------------------------------------------------------------------
+*c'est le fait de ouvoir apater afin de soutirer des informations essentielles
+Exemple concret
+Tu reçois un e‑mail qui semble venir de ta banque :
+
+« Votre compte sera verrouillé. Cliquez ici pour vérifier vos informations. »
+
+------------------------------------------------------------------------------
+TCP UDP
+------------------------------------------------------------------------------
+que signifie tcp , udp et quelle la diference entre en les 2 protocoles
+TCP:transmission control protocol(fiable/verifie que tous les paquets acheminés sont bel et bien recus/ Ex:email,tf fichier)
+UDP: User datagram protocol(rapide/EX: appel vocal, video etc)
+
+Paquet: Un petit morceau de données envoyé sur un réseau.
+
+qu'est ce qu'une injection sql
+------------------------------------------------------------------------------
+quelle est la difference entre un exploit et un payload?
+------------------------------------------------------------------------------
+*Exploit: Profite d’une faille pour pénétrer le système	🛠 Ouvre une porte en forçant(technique utilisée pour penetrer un si)
+Ex:Imagine une porte verrouillée (le système), et tu sais qu’elle a un défaut : si tu tapes trois fois puis tournes la poignée, elle s’ouvre.
+
+*Payload: Charge utile : ce que tu fais après avoir utilisé l’exploit. Ce que tu lances une fois entré
+Ex:Ouvrir un shell,Créer un utilisateur admin,Installer un backdoor,Exfiltrer des fichiers,Désactiver un antivirus
+
+------------------------------------------------------------------------------
+comment fonctionne un reverse shell?
+------------------------------------------------------------------------------
+Reverse shell : la victime se connecte vers l’attaquant.
+Le reverse shell est préféré quand la cible est derrière NAT/pare‑feu qui bloque les connexions entrantes.
+Un type de payload qui établit une connexion réseau sortante de la machine victime vers l’attaquant pour lui donner un shell distant
+
+Bind shell : la victime écoute (ouvre un port) et l’attaquant se connecte dessus.
+
+Oui, le reverse shell est un payload.
+📌 Il fait partie de la famille des payloads réseau, qui permettent à un attaquant d’avoir un accès distant à la machine cible.
+
+------------------------------------------------------------------------------
+a quoi sert Gobuster ?
+------------------------------------------------------------------------------
+Gobuster est un outil simple mais puissant pour découvrir des choses cachées sur un site web ou un domaine en essayant beaucoup d’URL / noms différents à partir d’une liste (wordlist).
+
+------------------------------------------------------------------------------
+a quoi sert Nikto ?
+------------------------------------------------------------------------------
+Nikto est un scanner web open source qui vérifie automatiquement un serveur HTTP(S) pour centaines de problèmes courants. Il ne « exploite » pas — il détecte et signale.
+
+------------------------------------------------------------------------------
+Hydra et John the ripper
+------------------------------------------------------------------------------
+Hydra et John the Ripper sont deux outils très connus dans le domaine du craquage de mots de passe,
+
+*john the ripper:il prend des hash (MD5, SHA, bcrypt, NTLM, etc.) et essaie de trouver la chaîne en clair qui produit ce hash, en testant des mots de passe issus de wordlists, de règles (variantes), ou via attaque par brute‑force.
+
+*hydra:il automatise l’envoi massif de paires login/mot‑de‑passe vers un service en tentant différentes combinaisons jusqu’à trouver une qui fonctionne.
+------------------------------------------------------------------------------
+Metasploit
+------------------------------------------------------------------------------
+Metasploit est un framework de tests d’intrusion. Ce n’est pas juste un programme unique, c’est une collection (bibliothèque) de modules qui permettent de:
+*Scanner / tester des services (modules auxiliary),
+*Exploiter des vulnérabilités connues (modules exploit),
+*Générer des charges utiles (payloads) comme meterpreter pour prendre une session sur une machine,
+*Actions après intrusion (modules post : exfiltration, pivot, dump de mots de passe).
+En gros : détecter → confirmer → exploiter → post‑exploitation.

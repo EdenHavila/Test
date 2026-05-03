@@ -1,0 +1,78 @@
+
+{% for fournisseur in fournisseurs %}
+<tr id="fournisseur-{{ fournisseur.pk }}">
+    <td class="text-truncate"><a 
+        hx-get="{% url 'Fournisseur:detail-fournisseur' fournisseur.pk %}" 
+        hx-target="#modal-body"
+        hx-swap="innerHTML" 
+        @click="$dispatch('open-modal')"
+        
+        >{{fournisseur.reference}}</a>
+    </td>
+    <td class="text-truncate">{{fournisseur.nom}}</td>
+    <td class="text-truncate">{{fournisseur.email|default:""}}</td>
+    <td class="text-truncate">{{fournisseur.telephone|default:""}}</td>
+    <td class="text-truncate">{{fournisseur.adresse|default:""}}</td>
+    <td class="text-truncate">
+         {% for type in fournisseur.types.all  %}
+            {{type.nom}}{% if not forloop.last %}, {% endif %} 
+        {% endfor %}     
+        
+    </td>
+    <td class="text-truncate">
+        {% with specs=fournisseur.specialite.all %}
+            {% for spec in specs|slice:":2" %}
+                {{ spec.nom }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            {% if specs.count > 2 %}
+                <strong><span class="text-muted">+{{ specs.count|add:"-2" }} autres</span></strong> 
+            {% endif %}
+        {% endwith %}
+    </td>
+    <td class="text-truncate">{{fournisseur.statut}}</td>
+
+    {# Actions #}
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-3">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-info"
+                    hx-get="{% url 'Fournisseur:detail-fournisseur' fournisseur.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'Fournisseur:modifier-fournisseur' fournisseur.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            
+            {# Bouton Supprimer #}
+            {% include "components/delete_button.html" with delete_url=fournisseur.get_delete_url target_id=fournisseur.get_target_id message="Voulez-vous supprimer ce fournisseur ?" %}
+        </div>
+    </td>
+</tr>
+{% endfor %}
+
+
+<!-- {% if not forloop.last %}, {% endif %} : pour espacer les données affichées par des virgules . ceci est fait uniquement du coté affichage et non dans la BD-->
+ 
+
+<!-- Utilisation de la balise with pour limiter l'affichage des spécialités à 2 et indiquer le nombre d'autres spécialités s'il y en a plus de 2 (version basique d'affichage directement dans le template)-->
+<!-- {% with specs=fournisseur.specialite.all %}
+            {% for spec in specs|slice:":2" %}
+                {{ spec.nom }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            {% if specs.count > 2 %}
+                <strong><span class="text-muted">+{{ specs.count|add:"-2" }} autres</span></strong> 
+            {% endif %}
+{% endwith %} -->

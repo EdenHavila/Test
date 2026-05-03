@@ -1,0 +1,159 @@
+{% load crispy_forms_tags %}
+
+<div class="mon-bootstrap p-3">
+    {# En-tête avec infos principales #}
+    <div class="mb-4">
+        <h5 class="mb-1">
+            <i class="bi bi-truck me-2"></i>
+            Livraison {{ livraison.code_livraison }}
+        </h5>
+        <span class="badge 
+            {% if livraison.statut == 'en_attente' %}bg-warning text-dark
+            {% elif livraison.statut == 'partielle' %}bg-info
+            {% elif livraison.statut == 'complete' %}bg-success
+            {% elif livraison.statut == 'annulee' %}bg-danger
+            {% else %}bg-secondary{% endif %}">
+            {{ livraison.get_statut_display }}
+        </span>
+    </div>
+
+    {# Informations de la livraison #}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Commande associée</small>
+                    <strong>{{ livraison.commande.code_cmnd }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Fournisseur</small>
+                    <strong>{{ livraison.commande.fournisseur.nom|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Date de livraison</small>
+                    <strong>{{ livraison.date_livraison|date:"d/m/Y" }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Date d'enregistrement</small>
+                    <strong>{{ livraison.date_enregistrement|date:"d/m/Y H:i" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Observations #}
+    {% if livraison.observation %}
+    <div class="mb-3">
+        <div class="card border-0 bg-light">
+            <div class="card-body py-2">
+                <small class="text-muted d-block">Observations</small>
+                <p class="mb-0">{{ livraison.observation }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Fichier bon de livraison #}
+    <div class="mb-3">
+        <div class="card border-0 bg-light">
+            <div class="card-body py-2">
+                <small class="text-muted d-block">Bon de livraison</small>
+                {% if livraison.fichier_bon_livraison %}
+                <a href="{{ livraison.fichier_bon_livraison.url }}" 
+                   target="_blank" 
+                   class="btn btn-sm btn-outline-primary mt-1">
+                    <i class="bi bi-download me-1"></i> Télécharger
+                </a>
+                {% else %}
+                <span class="text-muted">Aucun fichier</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Informations de la commande liée #}
+    <h6 class="mb-3 mt-4">
+        <i class="bi bi-file-text me-2"></i>
+        Détails de la commande
+    </h6>
+    
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Demande associée</small>
+                    <strong>{{ livraison.commande.demande.code_demande|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Montant de la commande</small>
+                    <strong class="text-primary">
+                        {% if livraison.commande.montant_total %}
+                            {{ livraison.commande.montant_total|floatformat:2 }} FCFA
+                        {% else %}
+                            -
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tableau des articles de la commande #}
+    {% with lignes=livraison.commande.lignes.all %}
+    {% if lignes %}
+    <div class="table-responsive mt-3">
+        <table class="table table-sm table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Type</th>
+                    <th>Désignation</th>
+                    <th class="text-end">Quantité</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in lignes %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <span class="badge {% if ligne.type == 'Bien' %}bg-info{% else %}bg-purple{% endif %}">
+                            {{ ligne.type }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if ligne.type == 'Bien' and ligne.bien %}
+                            {{ ligne.bien.designation }}
+                        {% elif ligne.type == 'Service' and ligne.service %}
+                            {{ ligne.service.designation }}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">{{ ligne.quantite }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    {% endwith %}
+</div>

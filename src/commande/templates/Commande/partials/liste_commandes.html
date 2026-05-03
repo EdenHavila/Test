@@ -1,0 +1,114 @@
+{% for commande in commandes %}
+<tr id="commande-{{ commande.id }}">
+    {# Code de la commande #}
+    <td class="text-truncate">
+        <a hx-get="{% url 'commande:detail-commande' commande.pk %}" 
+           hx-target="#modal-body" 
+           hx-swap="innerHTML" 
+           @click="$dispatch('open-modal')">
+            {{ commande.code_cmnd }}
+        </a>
+    </td>
+    
+    {# Demande associée #}
+    <td class="text-truncate">
+        {{ commande.demande.code_demande|default:"-" }}
+    </td>
+    
+    {# Fournisseur #}
+    <td class="text-truncate">
+        {{ commande.fournisseur.nom|default:"-" }}
+    </td>
+    
+    {# Date de commande #}
+    <td class="text-truncate">
+        {{ commande.date_cmnd|date:"d/m/Y" }}
+    </td>
+    
+    {# Résumé des lignes (articles) #}
+    <td class="text-truncate">
+        {% with lignes=commande.lignes.all %}
+            {% if lignes %}
+                <span class="badge bg-secondary" title="{% for l in lignes %}{{ l }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                    {{ lignes.count }} article{{ lignes.count|pluralize }}
+                </span>
+            {% else %}
+                <span class="text-muted">-</span>
+            {% endif %}
+        {% endwith %}
+    </td>
+    
+    {# Montant total #}
+    <td class="text-truncate">
+        {% with total=commande.montant_total %}
+            {% if total %}
+                <strong>{{ total|floatformat:2 }} FCFA</strong>
+            {% else %}
+                <span class="text-muted">-</span>
+            {% endif %}
+        {% endwith %}
+    </td>
+    
+    {# Statut avec badge coloré #}
+    <td class="text-truncate">
+        <span class="badge 
+            {% if commande.statut_cmnd == 'en_cours' %}bg-warning text-dark
+            {% elif commande.statut_cmnd == 'terminee' %}bg-success
+            {% elif commande.statut_cmnd == 'annulee' %}bg-danger
+            {% else %}bg-secondary{% endif %}">
+            {{ commande.get_statut_cmnd_display }}
+        </span>
+    </td>
+    
+    {# Fichier bon de commande #}
+    <td class="text-truncate mon-bootstrap">
+        {% if commande.fichier_bon_cmnd %}
+            <a href="{{ commande.fichier_bon_cmnd.url }}" 
+               target="_blank" 
+               class="btn btn-sm btn-outline-secondary"
+               title="Télécharger le bon de commande">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+            </a>
+        {% else %}
+            <span class="text-muted">-</span>
+        {% endif %}
+    </td>
+    
+    {# Actions #}
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-2">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-info"
+                    hx-get="{% url 'commande:detail-commande' commande.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'commande:modifier-commande' commande.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            
+            {# Bouton Supprimer #}
+            {% include "components/delete_button.html" with delete_url=commande.get_delete_url target_id=commande.get_target_id message="Voulez-vous supprimer cette commande ?" %}
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="9" class="text-center text-muted py-4">
+        <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+        Aucune commande trouvée
+    </td>
+</tr>
+{% endfor %}

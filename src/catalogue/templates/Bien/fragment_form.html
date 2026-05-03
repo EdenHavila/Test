@@ -1,0 +1,62 @@
+{% load crispy_forms_tags %}
+
+<h3 class="mb-4">
+    <i class="bi bi-box-seam"></i>
+    {% if bien %}Modifier le{% else %}Nouveau{% endif %} bien
+</h3>
+<form method="post"
+      hx-post="{% if is_editing %}{% url 'catalogue:modifier-bien' bien.id %}{% else %}{% url 'catalogue:ajouter-bien' %}{% endif %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      id="bien-form">
+    {% csrf_token %}
+    {{ form.media }}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ form.non_field_errors }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-info-circle"></i> Informations du bien
+        </legend>
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.sous_categorie|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.frequence_utilisation|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-12">
+                {{ form.designation|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                {{ form.marque|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.modele|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-12">
+                {{ form.informations_complementaires|as_crispy_field }}
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" class="btn btn-secondary" @click="$dispatch('close-modal')">
+            <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> {% if bien %}Modifier{% else %}Enregistrer{% endif %}
+        </button>
+    </div>
+</form>

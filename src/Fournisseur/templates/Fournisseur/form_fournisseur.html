@@ -1,0 +1,208 @@
+{% load crispy_forms_tags %}
+
+<h3 class="mb-4">
+    <i class="bi bi-{% if fournisseur %}pencil-square{% else %}person-plus{% endif %}"></i> 
+    {% if fournisseur %}Modifier le{% else %}Nouveau{% endif %} fournisseur
+</h3>
+
+<form method="post"
+      hx-post="{% if is_editing %}{% url 'Fournisseur:modifier-fournisseur' fournisseur.id %}{% else %}{% url 'Fournisseur:ajouter-fournisseur' %}{% endif %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      id="fournisseur-form">
+    {% csrf_token %}
+
+    {# Erreurs globales #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ form.non_field_errors }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+
+    {# SECTION 1 : INFORMATIONS GÉNÉRALES #}
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-building"></i> Informations générales
+        </legend>
+        
+        <div class="row g-3">
+            <div class="col-md-12">
+                <label for="id_nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                {{ form.nom }}
+                {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors }}</div>{% endif %}
+            </div>
+        </div>
+    </fieldset>
+
+    {# SECTION 2 : COORDONNÉES #}
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-envelope"></i> Coordonnées
+        </legend>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="id_email" class="form-label">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+                <label for="id_telephone" class="form-label">Téléphone</label>
+                {{ form.telephone }}
+                {% if form.telephone.errors %}<div class="text-danger small">{{ form.telephone.errors }}</div>{% endif %}
+            </div>
+        </div>
+        
+        <div class="row g-3 mt-1">
+            <div class="col-md-12">
+                <label for="id_adresse" class="form-label">Adresse</label>
+                {{ form.adresse }}
+                {% if form.adresse.errors %}<div class="text-danger small">{{ form.adresse.errors }}</div>{% endif %}
+            </div>
+        </div>
+    </fieldset>
+
+    {# SECTION 3 : SPÉCIALISATION #}
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-tags"></i> Spécialisation
+        </legend>
+        
+        <div class="row g-3">
+            <div class="col-md-6"
+                 hx-get="{% url 'Fournisseur:charger_specialite' %}"
+                 hx-target="#specialite-container"
+                 hx-trigger="change from:#id_types"
+                 hx-include="[name='types']">
+                <label class="form-label">Type de fournisseur <span class="text-danger">*</span></label>
+                <div class="checkbox-group" id="id_types">
+                    {% for choice in form.types %}
+                        <div class="form-check">
+                            {{ choice.tag }}
+                            <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if form.types.errors %}<div class="text-danger small">{{ form.types.errors }}</div>{% endif %}
+            </div>
+            <div class="col-md-6" id="specialite-container">
+                <label class="form-label">Spécialités <span class="text-danger">*</span></label>
+                <div class="checkbox-group">
+                    {% for choice in form.specialite %}
+                        <div class="form-check">
+                            {{ choice.tag }}
+                            <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted small mb-0"><i class="bi bi-info-circle"></i> Sélectionnez d'abord un type</p>
+                    {% endfor %}
+                </div>
+                {% if form.specialite.errors %}<div class="text-danger small">{{ form.specialite.errors }}</div>{% endif %}
+            </div>
+        </div>
+    </fieldset>
+
+    {# BOUTONS D'ACTION #}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" 
+                class="btn btn-secondary" 
+                onclick="document.querySelector('.modal').classList.remove('active')">
+            <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> 
+            {{ button_text }}
+        </button>
+    </div>
+</form>
+
+<style>
+/* Conteneur des checkboxes amélioré */
+.checkbox-group {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+}
+.checkbox-group::-webkit-scrollbar {
+    width: 5px;
+}
+.checkbox-group::-webkit-scrollbar-track {
+    background: transparent;
+}
+.checkbox-group::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+.checkbox-group::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Style des items checkbox */
+.checkbox-group .form-check {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    margin: 6px 2px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.checkbox-group .form-check:hover {
+    background: #f0f4ff;
+    border-color: #c7d2fe;
+}
+.checkbox-group .form-check:has(input:checked) {
+    background: #eef2ff;
+    border-color: #818cf8;
+}
+
+/* Checkbox custom */
+.checkbox-group .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    margin-right: 12px;
+    cursor: pointer;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.checkbox-group .form-check-input:checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
+}
+.checkbox-group .form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    border-color: #6366f1;
+}
+
+/* Label */
+.checkbox-group .form-check-label {
+    flex: 1;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.9rem;
+    color: #374151;
+    margin: 0;
+}
+.checkbox-group .form-check:has(input:checked) .form-check-label {
+    color: #4338ca;
+    font-weight: 500;
+}
+
+/* Message vide */
+.checkbox-group .text-muted {
+    padding: 20px;
+    text-align: center;
+    color: #9ca3af;
+}
+</style>
+ 

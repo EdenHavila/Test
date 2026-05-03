@@ -1,0 +1,8 @@
+<select name="{{ prefix }}-service" class="form-select field-service">
+    <option value="">-- Sélectionner un service --</option>
+    {% for item in items %}
+        <option value="{{ item.pk }}">{{ item.reference }} - {{ item.designation }}</option>
+    {% endfor %}
+</select>
+<!-- Champ bien caché avec valeur vide -->
+<input type="hidden" name="{{ prefix }}-bien" value="">

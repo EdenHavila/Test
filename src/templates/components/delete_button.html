@@ -1,0 +1,8 @@
+<button class="btn btn-danger btn-sm"
+        @click="$dispatch('open-delete-modal', {
+            delete_url: '{{ delete_url }}',
+            target_id: '{{ target_id }}',
+            message:'{{message}}'
+        })">
+    {{ label|default:"Supprimer" }}
+</button>

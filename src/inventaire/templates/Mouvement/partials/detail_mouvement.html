@@ -1,0 +1,174 @@
+{% load crispy_forms_tags %}
+
+<div class="mon-bootstrap p-3">
+    {# En-tête avec infos principales #}
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h5 class="mb-1">
+                <i class="bi bi-arrow-left-right me-2"></i>
+                Mouvement {{ mouvement.code }}
+            </h5>
+            <span class="badge 
+                {% if mouvement.type_mouvement == 'ENT' %}bg-success
+                {% elif mouvement.type_mouvement == 'SOR' %}bg-danger
+                {% elif mouvement.type_mouvement == 'TRF' %}bg-info
+                {% elif mouvement.type_mouvement == 'RET' %}bg-warning text-dark
+                {% elif mouvement.type_mouvement == 'COR' %}bg-secondary
+                {% else %}bg-secondary{% endif %}">
+                {{ mouvement.get_type_mouvement_display }}
+            </span>
+        </div>
+        {% if mouvement.reference_document %}
+        <a href="{{ mouvement.reference_document.url }}" 
+           target="_blank" 
+           class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-download me-1"></i> Document justificatif
+        </a>
+        {% endif %}
+    </div>
+
+    {# Informations du mouvement #}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Stock concerné</small>
+                    <strong>{{ mouvement.stock.code }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Bien</small>
+                    <strong>{{ mouvement.stock.bien.designation }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Quantité</small>
+                    <strong class="text-primary fs-5">{{ mouvement.quantite }} {{ mouvement.stock.get_unite_display }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Date du mouvement</small>
+                    <strong>{{ mouvement.date_mouvement|date:"d/m/Y H:i" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Source et Destination #}
+    <h6 class="mb-3">
+        <i class="bi bi-signpost-split me-2"></i>
+        Source et Destination
+    </h6>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Source</small>
+                    <strong>{{ mouvement.get_source_display|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Type de destination</small>
+                    <strong>{{ mouvement.get_destination_type_display|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if mouvement.destination %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Destination</small>
+                    <strong>{{ mouvement.destination }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Justification #}
+    {% if mouvement.justification %}
+    <h6 class="mb-3">
+        <i class="bi bi-chat-left-text me-2"></i>
+        Justification / Motif
+    </h6>
+    <div class="card border-0 bg-light mb-4">
+        <div class="card-body py-2">
+            <p class="mb-0">{{ mouvement.justification }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Informations complémentaires #}
+    <h6 class="mb-3">
+        <i class="bi bi-info-circle me-2"></i>
+        Informations complémentaires
+    </h6>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Responsable</small>
+                    <strong>
+                        {% if mouvement.responsable %}
+                            {{ mouvement.responsable.first_name }} {{ mouvement.responsable.last_name|default:mouvement.responsable.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Lieu de stockage</small>
+                    <strong>{{ mouvement.stock.get_lieu_stockage_display|default:"-" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# État actuel du stock #}
+    <div class="mt-4 p-3 border rounded {% if mouvement.stock.alerte_stock %}border-warning bg-warning bg-opacity-10{% else %}border-success bg-success bg-opacity-10{% endif %}">
+        <div class="d-flex align-items-center">
+            {% if mouvement.stock.alerte_stock %}
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-4 me-3"></i>
+                <div>
+                    <strong class="text-warning">Stock en alerte</strong>
+                    <p class="mb-0 small">
+                        Quantité actuelle : <strong>{{ mouvement.stock.quantite_disponible }}</strong> 
+                        (Seuil d'alerte : {{ mouvement.stock.niveau_alerte }})
+                    </p>
+                </div>
+            {% else %}
+                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                <div>
+                    <strong class="text-success">Stock normal</strong>
+                    <p class="mb-0 small">
+                        Quantité actuelle : <strong>{{ mouvement.stock.quantite_disponible }}</strong>
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

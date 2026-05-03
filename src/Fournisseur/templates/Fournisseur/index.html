@@ -1,0 +1,114 @@
+{% load static %}
+
+          <div class="container">
+            <!-- Navigation avec titre et recherche -->
+            <nav class="page-header">
+              <div class="header-left">
+                <div class="burger-menu"><i class="bi bi-list"></i></div>
+                <h1 class="page-title">Gestion des Fournisseurs</h1>
+              </div>
+
+              <div class="header-right">
+                <div class="search-box">
+                  <ion-icon name="search-outline"></ion-icon>
+                  <input type="search" 
+                         name="q" 
+                         id="search-fournisseur"
+                         placeholder="Rechercher par nom ou référence..." 
+                         hx-get="{% url 'Fournisseur:liste-fournisseurs' %}"
+                         hx-trigger="keyup changed delay:300ms"
+                         hx-target="#liste-biens"
+                         hx-include="[name='statut'], [name='type']"
+                         autocomplete="off" />
+                </div>
+
+                <div class="user">
+                  <div class="avatar">
+                    <img src="{% static 'ressources/1.png' %}" alt="" width="50" />
+                  </div>
+                </div>
+              </div>
+            </nav>
+
+            <!-- Barre de filtres contextuels -->
+            <div class="filter-bar">
+              <div class="filter">
+                <div class="filter-item">
+                  <label for="filter-statut">Statut :</label>
+                  <select name="statut" id="filter-statut"
+                          hx-get="{% url 'Fournisseur:liste-fournisseurs' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-biens"
+                          hx-include="[name='q'], [name='type']">
+                    <option value="">Tous</option>
+                    <option value="Actif">Actif</option>
+                    <option value="Suspendu">Suspendu</option>
+                    <option value="Inactif">Inactif</option>
+                  </select>
+                </div>
+
+                <div class="filter-item">
+                  <label for="filter-type">Type :</label>
+                  <select name="type" id="filter-type"
+                          hx-get="{% url 'Fournisseur:liste-fournisseurs' %}"
+                          hx-trigger="change"
+                          hx-target="#liste-biens"
+                          hx-include="[name='q'], [name='statut']">
+                    <option value="">Tous</option>
+                    <option value="Bien">Biens</option>
+                    <option value="Service">Services</option>
+                  </select>
+                </div>
+
+                <div class="filter-actions">
+                  <button type="button" class="btn-reset" 
+                          onclick="resetFilters('fournisseur')"
+                          title="Réinitialiser les filtres">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="content">
+              <div class="card">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+
+                        <tr>
+                            <th class="text-truncate">Reference</th>
+                            <th class="text-truncate">Nom</th>
+                            <th class="text-truncate">E-mail</th>
+                            <th class="text-truncate">Telephone</th>
+                            <th class="text-truncate">Adresse</th>
+                            <th class="text-truncate">Types</th>
+                            <th class="text-truncate">Specialite</th>
+                            <th class="text-truncate">Statut</th>
+                            <th class="text-truncate">Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="liste-biens" hx-get="{% url 'Fournisseur:liste-fournisseurs' %}" hx-trigger="load, refresh-messages from:body" hx-swap="innerHTML">
+
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% block modal_request %}
+<div class="modal_request">
+    <button class="new_request"
+            hx-get="{% url 'Fournisseur:ajouter-fournisseur' %}"
+            hx-target="#modal-body"
+            hx-swap="innerHTML"
+            @click="$dispatch('open-modal')">
+        Ajouter un fournisseur
+        <ion-icon name="add-circle-outline"></ion-icon>
+    </button>
+</div>
+
+{% endblock modal_request %}

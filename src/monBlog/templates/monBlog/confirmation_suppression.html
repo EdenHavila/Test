@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+    <h2>Confirmer la suppression</h2>
+  <p>Êtes-vous sûr de vouloir supprimer l'article : {{ article.titre  }} ?</p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a href="{% url 'article_detail' article.id %}" class="btn btn-secondary">Annuler</a>
+  </form>
+</body>
+</html>

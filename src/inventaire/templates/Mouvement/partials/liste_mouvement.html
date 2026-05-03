@@ -1,0 +1,88 @@
+
+{% for mouvement in mouvements %}
+<tr id="mouvement-{{ mouvement.id }}">
+    <td class="text-truncate"><a 
+        hx-get="{% url 'inventaire:detail-mouvement' mouvement.pk %}" 
+        hx-target="#modal-body" 
+        hx-swap="innerHTML" 
+        @click="$dispatch('open-modal')">{{ mouvement.code }}</a>
+    </td>
+    <td class="text-truncate">{{ mouvement.stock.code }} - {{ mouvement.stock.bien.designation }}</td>
+    <td class="text-truncate">
+        <span class="badge 
+            {% if mouvement.type_mouvement == 'ENT' %}bg-success
+            {% elif mouvement.type_mouvement == 'SOR' %}bg-danger
+            {% elif mouvement.type_mouvement == 'TRF' %}bg-info
+            {% elif mouvement.type_mouvement == 'RET' %}bg-warning
+            {% else %}bg-secondary{% endif %}">
+            {{ mouvement.get_type_mouvement_display }}
+        </span>
+    </td>
+    <td class="text-truncate">{{ mouvement.quantite }}</td>
+    <td class="text-truncate">{{ mouvement.get_source_display|default:"-" }}</td>
+    <td class="text-truncate">{{ mouvement.get_destination_type_display|default:"-" }}</td>
+    <td class="text-truncate">{{ mouvement.destination|default:"-" }}</td>
+    <td class="text-truncate">{{ mouvement.justification|default:"-"|truncatechars:30 }}</td>
+    <td class="text-truncate">
+        {% if mouvement.reference_document %}
+            <a href="{{ mouvement.reference_document.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <ion-icon name="document-outline"></ion-icon>
+            </a>
+        {% else %}
+            -
+        {% endif %}
+    </td>
+    <td class="text-truncate">{{ mouvement.responsable.first_name }} {{ mouvement.responsable.last_name|default:mouvement.responsable.username }}</td>
+    <td class="text-truncate">{{ mouvement.date_mouvement|date:"d/m/Y H:i" }}</td>
+    <td class="text-truncate">{{ mouvement.date_mouvement|date:"d/m/Y H:i" }}</td>
+
+    
+        {# Actions #}
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-3">
+            {# Bouton Voir détails #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-info"
+                    hx-get="{% url 'inventaire:detail-mouvement' mouvement.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            
+            {# Bouton Modifier #}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    hx-get="{% url 'inventaire:modifier-mouvement' mouvement.pk %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            
+            {# Bouton Supprimer #}
+            {% include "components/delete_button.html" with delete_url=mouvement.get_delete_url target_id=mouvement.get_target_id message="Voulez-vous supprimer ce mouvement ?" %}
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="12" class="text-center text-muted text-center ">Aucun mouvement enregistré</td>
+</tr>
+{% endfor %}
+
+
+<!-- {% if not forloop.last %}, {% endif %} : pour espacer les données affichées par des virgules . ceci est fait uniquement du coté affichage et non dans la BD-->
+ 
+
+<!-- Utilisation de la balise with pour limiter l'affichage des spécialités à 2 et indiquer le nombre d'autres spécialités s'il y en a plus de 2 (version basique d'affichage directement dans le template)-->
+<!-- {% with specs=fournisseur.specialite.all %}
+            {% for spec in specs|slice:":2" %}
+                {{ spec.nom }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            {% if specs.count > 2 %}
+                <strong><span class="text-muted">+{{ specs.count|add:"-2" }} autres</span></strong> 
+            {% endif %}
+{% endwith %} -->

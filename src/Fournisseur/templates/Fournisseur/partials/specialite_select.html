@@ -1,0 +1,19 @@
+<!-- Partiel pour charger les spécialités dynamiquement -->
+<label class="form-label">Spécialités <span class="text-danger">*</span></label>
+<div class="checkbox-group">
+    {% for cat in sous_categories %}
+        <div class="form-check">
+            <input type="checkbox" 
+                   name="specialite" 
+                   value="{{ cat.id }}" 
+                   id="specialite_{{ cat.id }}" 
+                   class="form-check-input"
+                   {% if cat.id|stringformat:"s" in selected %}checked{% endif %}>
+            <label class="form-check-label" for="specialite_{{ cat.id }}">{{ cat.nom }}</label>
+        </div>
+    {% empty %}
+        <div class="text-muted">
+            <i class="bi bi-info-circle"></i> Aucune spécialité disponible pour ce type
+        </div>
+    {% endfor %}
+</div>

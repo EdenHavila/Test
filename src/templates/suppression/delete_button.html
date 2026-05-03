@@ -1,0 +1,8 @@
+<button class="btn btn-danger btn-sm"
+        hx-get="{{ delete_url }}"
+        hx-target="#modal-content"
+        hx-trigger="click"
+        hx-swap="innerHTML"
+        @click="$dispatch('open-delete-modal')">
+    {{ label|default:"Supprimer" }}
+</button>

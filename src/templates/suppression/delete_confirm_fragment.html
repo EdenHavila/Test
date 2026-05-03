@@ -1,0 +1,25 @@
+<div>
+    <div class="modal-header">
+        <h5 class="modal-title">{{ title }}</h5>
+        <button class="btn-close" @click="$dispatch('close-modal')"></button>
+    </div>
+
+    <div class="modal-body">
+        <p>{{ message }}</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-secondary" @click="$dispatch('close-modal')">Annuler</button>
+
+        <form
+            hx-post="{{ deleteUrl }}"
+            hx-target="#{{ targetId }}"
+            hx-swap="outerHTML"
+            @submit="$dispatch('close-modal')"
+        >
+            <button type="submit" class="btn btn-danger">
+                {{ confirm_label|default:"Confirmer" }}
+            </button>
+        </form>
+    </div>
+</div>

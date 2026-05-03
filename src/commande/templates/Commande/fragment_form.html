@@ -1,0 +1,143 @@
+{% load crispy_forms_tags %}
+
+<h3 class="mb-4">
+    <i class="bi bi-cart-plus"></i> 
+    {% if commande %}Modifier la{% else %}Nouvelle{% endif %} commande
+</h3>
+
+<form method="post"
+      hx-post="{% if commande %}{% url 'commande:modifier-commande' commande.pk %}{% else %}{% url 'commande:ajouter-commande' %}{% endif %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML"
+      enctype="multipart/form-data"
+      id="commande-form">
+    {% csrf_token %}
+    {{ form.media }}
+
+    {# Erreurs globales #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ form.non_field_errors }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endif %}
+
+    {# ═══════════════════════════════════════════════════════════════ #}
+    {# SECTION 1 : INFORMATIONS PRINCIPALES                            #}
+    {# ═══════════════════════════════════════════════════════════════ #}
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-info-circle"></i> Informations générales
+        </legend>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.demande|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+                {{ form.fournisseur|as_crispy_field }}
+            </div>
+        </div>
+        
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">
+                {{ form.date_cmnd|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.statut_cmnd|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.fichier_bon_cmnd|as_crispy_field }}
+            </div>
+        </div>
+    </fieldset>
+
+    {# ═══════════════════════════════════════════════════════════════ #}
+    {# SECTION 2 : LIGNES DE COMMANDE                                  #}
+    {# ═══════════════════════════════════════════════════════════════ #}
+    <fieldset class="border rounded p-3 mb-4">
+        <legend class="float-none w-auto px-2 fs-6 fw-semibold text-primary">
+            <i class="bi bi-list-ul"></i> Lignes de commande
+        </legend>
+
+        <!-- Management form pour le formset -->
+        {{ formset.management_form }}
+        
+        <!-- Container des lignes -->
+        <div id="lignes-container">
+            {% for ligne_form in formset %}
+                {% include 'Commande/partials/ligne_form.html' with form=ligne_form form_idx=forloop.counter0 %}
+            {% empty %}
+                <p class="text-muted text-center py-3">
+                    <i class="bi bi-inbox"></i> Aucune ligne ajoutée
+                </p>
+            {% endfor %}
+        </div>
+
+        <!-- Bouton d'ajout de ligne -->
+        <div class="text-center mt-3">
+            <button type="button" 
+                    class="btn btn-outline-primary btn-sm"
+                    hx-get="{% url 'commande:commande-ligne-add' %}"
+                    hx-target="#lignes-container"
+                    hx-swap="beforeend"
+                    hx-vals='js:{"form_idx": document.querySelectorAll(".ligne-form").length}'>
+                <i class="bi bi-plus-circle"></i> Ajouter une ligne
+            </button>
+        </div>
+    </fieldset>
+
+    {# ═══════════════════════════════════════════════════════════════ #}
+    {# BOUTONS D'ACTION                                                #}
+    {# ═══════════════════════════════════════════════════════════════ #}
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        <button type="button" 
+                class="btn btn-secondary" 
+                @click="$dispatch('close-modal')">
+            <i class="bi bi-x-circle"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> 
+            {% if commande %}Modifier{% else %}Créer{% endif %}
+        </button>
+    </div>
+</form>
+
+<script>
+// Initialiser Select2 sur les champs demande et fournisseur
+$(document).ready(function() {
+    $('#id_demande').select2({
+        width: '100%',
+        placeholder: '-- Rechercher une demande --',
+        allowClear: true,
+        dropdownParent: $('#myModal')
+    });
+    
+    $('#id_fournisseur').select2({
+        width: '100%',
+        placeholder: '-- Rechercher un fournisseur --',
+        allowClear: true,
+        dropdownParent: $('#myModal')
+    });
+});
+
+// Mise à jour du compteur de formulaires après ajout d'une ligne
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'lignes-container') {
+        updateFormsetManagement();
+        // Supprimer le message "Aucune ligne" s'il existe
+        const emptyMsg = evt.detail.target.querySelector('p.text-muted');
+        if (emptyMsg && document.querySelectorAll('.ligne-form').length > 0) {
+            emptyMsg.remove();
+        }
+    }
+});
+
+function updateFormsetManagement() {
+    const totalForms = document.querySelectorAll('.ligne-form').length;
+    const totalInput = document.querySelector('#id_lignes-TOTAL_FORMS');
+    if (totalInput) {
+        totalInput.value = totalForms;
+    }
+}
+</script>

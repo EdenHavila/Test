@@ -1,0 +1,224 @@
+{% load static %}
+<div class="container" style="padding: 1rem 1rem; max-width: 100%; box-sizing: border-box;">
+    <!-- Navigation cohérente avec le reste de l'application -->
+    <nav class="page-header">
+        <div class="header-left">
+            <div class="burger-menu"><i class="bi bi-list"></i></div>
+            <h1 class="page-title">
+                <i class="bi bi-speedometer2"></i> Tableau de bord
+            </h1>
+        </div>
+
+        <div class="header-right">
+            <div class="dashboard-date" style="display: flex; align-items: center; gap: 0.5rem; color: #6c757d; font-size: 0.9rem;">
+                <i class="bi bi-calendar3"></i>
+                <span>{{ today|date:"l d F Y" }}</span>
+            </div>
+
+            <div class="user">
+                <div class="avatar" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 0.9rem; color: #495057;">Bonjour, <strong>{{ request.user.username }}</strong></span>
+                    <img src="{% static 'ressources/1.png' %}" alt="" width="45" style="border-radius: 50%; border: 2px solid #e9ecef;" />
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Barre de résumé rapide (remplace filter-bar) -->
+    <div class="filter-bar">
+        <div class="filter" style="justify-content: flex-start;">
+            <div class="dashboard-summary" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                <span class="summary-badge" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: #e8f4fd; border-radius: 20px; font-size: 0.85rem; color: #0d6efd;">
+                    <i class="bi bi-activity"></i> Vue d'ensemble de votre activité
+                </span>
+                <span class="summary-badge" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: #fff3cd; border-radius: 20px; font-size: 0.85rem; color: #856404;">
+                    <i class="bi bi-exclamation-triangle"></i> {{ articles_faible_stock }} article(s) en alerte stock
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartes statistiques -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <!-- Demandes -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem; font-size: 0.9rem;">Total Demandes</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_demandes }}</h3>
+                    <small style="opacity: 0.8;">{{ demandes_en_cours }} en cours</small>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-file-earmark-text" style="font-size: 1.8rem;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commandes -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem; font-size: 0.9rem;">Total Commandes</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_commandes }}</h3>
+                    <small style="opacity: 0.8;">{{ commandes_en_cours }} en cours</small>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-cart-check" style="font-size: 1.8rem;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fournisseurs -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem; font-size: 0.9rem;">Fournisseurs</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_fournisseurs }}</h3>
+                    <small style="opacity: 0.8;">{{ fournisseurs_actifs }} actifs</small>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-people" style="font-size: 1.8rem;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem; font-size: 0.9rem;">Articles en Stock</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_articles_stock }}</h3>
+                    <small style="opacity: 0.8;">{{ articles_faible_stock }} en alerte</small>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-box-seam" style="font-size: 1.8rem;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Livraisons -->
+        <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(250, 112, 154, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="opacity: 0.9; margin-bottom: 0.5rem; font-size: 0.9rem;">Livraisons</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0;">{{ total_livraisons }}</h3>
+                    <small style="opacity: 0.8;">Total effectuées</small>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-truck" style="font-size: 1.8rem;"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Résumé rapide -->
+    <div class="quick-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #fff; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+            <i class="bi bi-check-circle" style="font-size: 1.5rem; color: #28a745;"></i>
+            <p style="margin: 0.5rem 0 0; color: #666; font-size: 0.85rem;">Demandes validées</p>
+            <strong style="font-size: 1.3rem; color: #333;">{{ demandes_validees }}</strong>
+        </div>
+        <div style="background: #fff; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+            <i class="bi bi-check2-all" style="font-size: 1.5rem; color: #17a2b8;"></i>
+            <p style="margin: 0.5rem 0 0; color: #666; font-size: 0.85rem;">Commandes terminées</p>
+            <strong style="font-size: 1.3rem; color: #333;">{{ commandes_terminees }}</strong>
+        </div>
+        <div style="background: #fff; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+            <i class="bi bi-exclamation-triangle" style="font-size: 1.5rem; color: #ffc107;"></i>
+            <p style="margin: 0.5rem 0 0; color: #666; font-size: 0.85rem;">Stock faible</p>
+            <strong style="font-size: 1.3rem; color: #333;">{{ articles_faible_stock }}</strong>
+        </div>
+    </div>
+
+    <!-- Tableaux d'activités récentes -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Dernières demandes -->
+        <div class="card" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); overflow: hidden;">
+            <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="margin: 0; color: #333; font-weight: 600;">
+                    <i class="bi bi-clock-history" style="color: #667eea;"></i> Dernières demandes
+                </h5>
+                <a hx-get="{% url 'Demande:index' %}" hx-target="#content-wrapper" hx-swap="innerHTML" 
+                   style="color: #667eea; text-decoration: none; font-size: 0.85rem; cursor: pointer;">Voir tout →</a>
+            </div>
+            <div style="padding: 0;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; color: #666;">Code</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; color: #666;">Date</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; color: #666;">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for demande in dernieres_demandes %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 0.75rem 1rem; font-size: 0.9rem;">{{ demande.code_demande }}</td>
+                            <td style="padding: 0.75rem 1rem; font-size: 0.9rem; color: #666;">{{ demande.date_demande|date:"d/m/Y" }}</td>
+                            <td style="padding: 0.75rem 1rem;">
+                                <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; 
+                                    {% if demande.statut_demande == 'Validée' %}background: #d4edda; color: #155724;
+                                    {% elif demande.statut_demande == 'En cours' %}background: #fff3cd; color: #856404;
+                                    {% elif demande.statut_demande == 'Rejetée' %}background: #f8d7da; color: #721c24;
+                                    {% else %}background: #e2e3e5; color: #383d41;{% endif %}">
+                                    {{ demande.statut_demande }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="padding: 1.5rem; text-align: center; color: #999;">Aucune demande</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dernières commandes -->
+        <div class="card" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); overflow: hidden;">
+            <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="margin: 0; color: #333; font-weight: 600;">
+                    <i class="bi bi-cart3" style="color: #11998e;"></i> Dernières commandes
+                </h5>
+                <a hx-get="{% url 'commande:index-commande' %}" hx-target="#content-wrapper" hx-swap="innerHTML" 
+                   style="color: #11998e; text-decoration: none; font-size: 0.85rem; cursor: pointer;">Voir tout →</a>
+            </div>
+            <div style="padding: 0;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; color: #666;">Code</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; color: #666;">Date</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; color: #666;">Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commande in dernieres_commandes %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 0.75rem 1rem; font-size: 0.9rem;">{{ commande.code_cmnd }}</td>
+                            <td style="padding: 0.75rem 1rem; font-size: 0.9rem; color: #666;">{{ commande.date_cmnd|date:"d/m/Y" }}</td>
+                            <td style="padding: 0.75rem 1rem;">
+                                <span style="padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;
+                                    {% if commande.statut_cmnd == 'terminee' %}background: #d4edda; color: #155724;
+                                    {% elif commande.statut_cmnd == 'en_cours' %}background: #cce5ff; color: #004085;
+                                    {% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                                    {{ commande.get_statut_cmnd_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="padding: 1.5rem; text-align: center; color: #999;">Aucune commande</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

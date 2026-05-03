@@ -1,0 +1,58 @@
+
+{% for bien in biens %}
+<tr id="bien-{{ bien.id }}">
+    <td class="text-truncate">
+        <a href="#"
+           hx-get="{% url 'catalogue:detail-bien' bien.id %}"
+           hx-target="#modal-body"
+           hx-swap="innerHTML"
+           @click="$dispatch('open-modal')">
+            {{ bien.reference }}
+        </a>
+    </td>
+    <td class="text-truncate">{{ bien.sous_categorie|default:"-" }}</td>
+    <td class="text-truncate">{{ bien.designation }}</td>
+    <td class="text-truncate">{{ bien.marque|default:"-" }}</td>
+    <td class="text-truncate">{{ bien.modele|default:"-" }}</td>
+    <td class="text-truncate">
+        <span class="badge 
+            {% if bien.frequence_utilisation == 'hebdomadaire' %}bg-success
+            {% elif bien.frequence_utilisation == 'mensuel' %}bg-info
+            {% elif bien.frequence_utilisation == 'annuel' %}bg-warning text-dark
+            {% elif bien.frequence_utilisation == 'ponctuel' %}bg-secondary
+            {% else %}bg-light text-dark{% endif %}">
+            {{ bien.get_frequence_utilisation_display|default:"-" }}
+        </span>
+    </td>
+    <td class="text-truncate mon-bootstrap">
+        <div class="d-flex gap-1">
+            <button type="button"
+                    class="btn btn-info btn-sm"
+                    hx-get="{% url 'catalogue:detail-bien' bien.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Voir les détails">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button type="button"
+                    class="btn btn-warning btn-sm"
+                    hx-get="{% url 'catalogue:modifier-bien' bien.id %}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML"
+                    @click="$dispatch('open-modal')"
+                    title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </button>
+            {% include "components/delete_button.html" with delete_url=bien.get_delete_url target_id=bien.get_target_id message="Voulez-vous supprimer ce bien ?" %}
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="7" class="text-center text-muted py-3">
+        <i class="bi bi-inbox d-block mb-1"></i>
+        Aucun bien trouvé
+    </td>
+</tr>
+{% endfor %}
