@@ -30,7 +30,7 @@ class ReferenceCounter(models.Model):
     """""
 
 class Famille(models.Model):
-    reference = models.CharField(max_length=10, blank=True, editable=False)
+    reference = models.CharField(max_length=20, blank=True, editable=False)
     designation = models.CharField(max_length=200)
 
     def save(self, *args, **kwargs):
@@ -51,7 +51,7 @@ class Categorie(models.Model):
 
     ]
 
-    reference = models.CharField(max_length=10, blank=True, editable=False)
+    reference = models.CharField(max_length=20, blank=True, editable=False)
     designation = models.CharField(max_length=200)
     famille = models.ForeignKey(Famille,  on_delete=models.CASCADE)
 
@@ -70,7 +70,7 @@ class SousCategorie(models.Model):
         ('Service', 'Services'),
 
     ]                                                           
-    reference = models.CharField(max_length=10, blank=True, editable=False)
+    reference = models.CharField(max_length=20, blank=True, editable=False)
     type = models.CharField(max_length=10, choices=TYPE,null=True, blank=True)
     categorie = models.ForeignKey(Categorie, on_delete=models.CASCADE, related_name='sous_categories')
     nom = models.CharField(max_length=100)
@@ -95,7 +95,7 @@ class Bien(models.Model):
         ('autre','Autre  '),
     ]
     sous_categorie = models.ForeignKey(SousCategorie, on_delete=models.CASCADE, related_name='biens',default=1)
-    reference = models.CharField(max_length=10, blank=True, editable=False)
+    reference = models.CharField(max_length=20, blank=True, editable=False)
     designation = models.CharField(max_length=200)
     frequence_utilisation = models.CharField(max_length=20, choices=FREQUENCE_CHOICES, default='draft')
     numero = models.PositiveIntegerField(blank=True,null=True)  # Un numéro unique pour chaque bien
@@ -145,7 +145,7 @@ class Service(models.Model):
         ('ponctuel','Ponctuel  '),
     ]
     categorie = models.ForeignKey(Categorie, related_name='services', on_delete=models.CASCADE)
-    reference = models.CharField(max_length=10, blank=True, editable=False)
+    reference = models.CharField(max_length=20, blank=True, editable=False)
     designation = models.CharField(max_length=200)
     frequence  = models.CharField(max_length=20, choices=FREQUENCE, default='draft')
     description = models.TextField()

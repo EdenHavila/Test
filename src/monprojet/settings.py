@@ -28,6 +28,12 @@ DEBUG = True
 # j'ai ajouté cette ligne (plus pécisément "*")pour autoriser toutes les adresses IP à accéder à l'application pendant le développement
 ALLOWED_HOSTS = ["*"]
 
+# Liste des adresses autorisées pour les requêtes POST sécurisées (CSRF)
+# Ici on autorise ton serveur local accessible depuis le réseau
+# IMPORTANT : doit contenir le protocole + IP + port
+#CSRF_TRUSTED_ORIGINS = [
+#    "http://192.168.29.152:8080" # Remplace par l'adresse IP et le port de ton serveur local
+#]
 
 # Application definition
 

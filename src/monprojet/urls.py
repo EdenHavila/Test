@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path,include
 from .views import messages_partial, index
+#from .views import github_webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,6 +33,10 @@ urlpatterns = [
     path('commande/', include('commande.urls')),
     path('inventaire/', include('inventaire.urls')),
     path('select2/', include('django_select2.urls')),
+
+
+    #path("webhook/", github_webhook),
+
 
 ]
 # Servir les fichiers médias en mode développement
