@@ -22,6 +22,10 @@
                          autocomplete="off" />
                 </div>
 
+                {% url 'catalogue:export-biens-csv' as csv_export_url %}
+                {% url 'catalogue:export-biens-excel' as excel_export_url %}
+                {% include "components/export_actions.html" with csv_url=csv_export_url excel_url=excel_export_url csv_title="Exporter les biens en CSV" excel_title="Exporter les biens en Excel" %}
+
                 <div class="user">
                   <div class="avatar">
                     <img src="{% static 'ressources/1.png' %}" alt="" width="50" />

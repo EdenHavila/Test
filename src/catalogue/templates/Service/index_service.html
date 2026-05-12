@@ -18,6 +18,9 @@
                hx-include="[name='frequence'], [name='categorie']"
                autocomplete="off" />
       </div>
+      {% url 'catalogue:export-services-csv' as csv_export_url %}
+      {% url 'catalogue:export-services-excel' as excel_export_url %}
+      {% include "components/export_actions.html" with csv_url=csv_export_url excel_url=excel_export_url csv_title="Exporter les services en CSV" excel_title="Exporter les services en Excel" %}
       <div class="user">
         <div class="avatar">
           <img src="{% static 'ressources/1.png' %}" alt="" width="50" />

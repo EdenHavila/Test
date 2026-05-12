@@ -114,6 +114,29 @@ function resetFilters(context) {
 }
 
 /**
+ * Lance un export en reprenant les filtres actuellement visibles sur l'écran.
+ * Les boutons d'export restent ainsi synchronisés avec les champs de recherche et de filtre.
+ */
+function exportCurrentFilters(linkElement) {
+  const baseUrl = linkElement.getAttribute('href');
+  const params = new URLSearchParams();
+
+  document.querySelectorAll('.container .page-header input[name], .container .filter-bar input[name], .container .filter-bar select[name]').forEach((field) => {
+    if (!field.name) {
+      return;
+    }
+    const value = field.value ? String(field.value).trim() : '';
+    if (value) {
+      params.set(field.name, value);
+    }
+  });
+
+  const queryString = params.toString();
+  window.location.href = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+  return false;
+}
+
+/**
  * ⭕ APPROCHE ALPINE.JS (DÉSACTIVÉE - CODE COMMENTÉ)
  * 
  * Alternative moderne utilisant Alpine.js avec x-data et @click

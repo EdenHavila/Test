@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse
+from django.utils import timezone
 from .forms import *
 #from django.forms import modelformset_factory
 from .models import Demande
@@ -19,6 +20,10 @@ from django.template.loader import render_to_string
 import json
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET
+from monprojet.utils.export_utils import (
+    build_csv_response,
+    build_excel_response,
+)
 
 
 
@@ -107,8 +112,19 @@ def charge_champ_demandes(request):
 @login_required
 @any_role_required
 def liste(request):
+    demandes = _get_filtered_demandes(request)
+    return render(request, 'Demande/partials/liste.html', {'demandes': demandes})
+
+
+def _get_filtered_demandes(request, user_only=False):
+    """Construit la liste des demandes en réutilisant exactement les filtres de l'écran.
+
+    Le paramètre `user_only` permet de limiter l'export aux demandes de l'utilisateur connecté.
+    """
     demandes = Demande.objects.all().order_by('-pk')
-    
+    if user_only:
+        demandes = demandes.filter(utilisateur=request.user)
+
     # Recherche par texte
     q = request.GET.get('q', '').strip()
     if q:
@@ -117,33 +133,33 @@ def liste(request):
             Q(code_demande__icontains=q) |
             Q(motif_demande__icontains=q)
         )
-    
+
     # Filtre par type de demande
     type_demande = request.GET.get('type_demande', '').strip()
     if type_demande:
         demandes = demandes.filter(type_demande=type_demande)
-    
+
     # Filtre par nature de demande
     nature_demande = request.GET.get('nature_demande', '').strip()
     if nature_demande:
         demandes = demandes.filter(nature_demande=nature_demande)
-    
+
     # Filtre par statut
     statut_demande = request.GET.get('statut_demande', '').strip()
     if statut_demande:
         demandes = demandes.filter(statut_demande=statut_demande)
-    
+
     # Filtre par date de début
     date_debut = request.GET.get('date_debut', '').strip()
     if date_debut:
         demandes = demandes.filter(date_demande__gte=date_debut)
-    
+
     # Filtre par date de fin
     date_fin = request.GET.get('date_fin', '').strip()
     if date_fin:
         demandes = demandes.filter(date_demande__lte=date_fin)
-    
-    return render(request, 'Demande/partials/liste.html', {'demandes': demandes})
+
+    return demandes
 
 
 @login_required
@@ -161,39 +177,66 @@ def mes_demandes_index(request):
 @any_role_required
 def mes_demandes_liste(request):
     """Vue pour afficher uniquement les demandes de l'utilisateur connecté"""
-    # Filtrer par l'utilisateur connecté
-    demandes = Demande.objects.filter(utilisateur=request.user).order_by('-pk')
-    
-    # Recherche par texte
-    q = request.GET.get('q', '').strip()
-    if q:
-        from django.db.models import Q
-        demandes = demandes.filter(
-            Q(code_demande__icontains=q) |
-            Q(motif_demande__icontains=q)
-        )
-    
-    # Filtre par nature de demande
-    nature_demande = request.GET.get('nature_demande', '').strip()
-    if nature_demande:
-        demandes = demandes.filter(nature_demande=nature_demande)
-    
-    # Filtre par statut
-    statut_demande = request.GET.get('statut_demande', '').strip()
-    if statut_demande:
-        demandes = demandes.filter(statut_demande=statut_demande)
-    
-    # Filtre par date de début
-    date_debut = request.GET.get('date_debut', '').strip()
-    if date_debut:
-        demandes = demandes.filter(date_demande__gte=date_debut)
-    
-    # Filtre par date de fin
-    date_fin = request.GET.get('date_fin', '').strip()
-    if date_fin:
-        demandes = demandes.filter(date_demande__lte=date_fin)
-    
+    demandes = _get_filtered_demandes(request, user_only=True)
     return render(request, 'Demande/partials/liste_mes_demandes.html', {'demandes': demandes})
+
+
+def _demandes_export_rows(demandes):
+    """Prépare les lignes d'export pour les demandes."""
+    return [
+        [
+            demande.code_demande,
+            demande.type_demande,
+            demande.nature_demande,
+            demande.date_demande.strftime('%d/%m/%Y') if demande.date_demande else '-',
+            demande.date_enregistrement.strftime('%d/%m/%Y %H:%M') if demande.date_enregistrement else '-',
+            demande.date_mise_a_jour.strftime('%d/%m/%Y %H:%M') if demande.date_mise_a_jour else '-',
+            demande.motif_demande,
+            demande.statut_demande,
+            demande.utilisateur.get_username() if demande.utilisateur else '-',
+        ]
+        for demande in demandes
+    ]
+
+
+@login_required
+@any_role_required
+def export_demandes_csv(request):
+    """Exporte la liste filtrée des demandes au format CSV."""
+    demandes = _get_filtered_demandes(request)
+    headers = ["Code", "Type", "Nature", "Date demande", "Enregistrée le", "Modifiée le", "Motif", "Statut", "Utilisateur"]
+    filename = f"demandes_{timezone.now():%Y%m%d_%H%M}.csv"
+    return build_csv_response(filename, headers, _demandes_export_rows(demandes))
+
+
+@login_required
+@any_role_required
+def export_demandes_excel(request):
+    """Exporte la liste filtrée des demandes au format Excel."""
+    demandes = _get_filtered_demandes(request)
+    headers = ["Code", "Type", "Nature", "Date demande", "Enregistrée le", "Modifiée le", "Motif", "Statut", "Utilisateur"]
+    filename = f"demandes_{timezone.now():%Y%m%d_%H%M}.xlsx"
+    return build_excel_response(filename, "Demandes", headers, _demandes_export_rows(demandes))
+
+
+@login_required
+@any_role_required
+def export_mes_demandes_csv(request):
+    """Exporte uniquement les demandes de l'utilisateur connecté au format CSV."""
+    demandes = _get_filtered_demandes(request, user_only=True)
+    headers = ["Code", "Type", "Nature", "Date demande", "Enregistrée le", "Modifiée le", "Motif", "Statut", "Utilisateur"]
+    filename = f"mes_demandes_{timezone.now():%Y%m%d_%H%M}.csv"
+    return build_csv_response(filename, headers, _demandes_export_rows(demandes))
+
+
+@login_required
+@any_role_required
+def export_mes_demandes_excel(request):
+    """Exporte uniquement les demandes de l'utilisateur connecté au format Excel."""
+    demandes = _get_filtered_demandes(request, user_only=True)
+    headers = ["Code", "Type", "Nature", "Date demande", "Enregistrée le", "Modifiée le", "Motif", "Statut", "Utilisateur"]
+    filename = f"mes_demandes_{timezone.now():%Y%m%d_%H%M}.xlsx"
+    return build_excel_response(filename, "Mes demandes", headers, _demandes_export_rows(demandes))
 
 
 @login_required

@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.urls import path
 from catalogue.urls import app_name
 from .views import *
+from .exports import *
 
 app_name='Fournisseur'
 urlpatterns = [
@@ -15,6 +16,8 @@ urlpatterns = [
     path('ajouter_fournisseur/', CreateUpdateView,name='ajouter-fournisseur'),
     path('modifier_fournisseur/<int:pk>/', CreateUpdateView, name='modifier-fournisseur'),
     path('liste/', liste_fournisseurs, name='liste-fournisseurs'),
+    path('export/csv/', export_fournisseurs_csv, name='export-fournisseurs-csv'),
+    path('export/excel/', export_fournisseurs_excel, name='export-fournisseurs-excel'),
     path('detail/<int:pk>/', detail_fournisseur, name='detail-fournisseur'),
     path('delete/<int:pk>/', supprimer_fournisseur, name='delete'),
 

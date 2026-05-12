@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.utils import timezone
 from catalogue.models import Bien, Service
 from .models import Commande, LigneCommande, Livraison
 from .forms import CommandeForm, LigneCommandeForm, LigneCommandeFormSet, LivraisonForm
 from django.contrib.auth.decorators import login_required
+from monprojet.utils.export_utils import (
+    build_csv_response,
+    build_excel_response,
+)
 
 # Create your views here.
 #----------------------------------------------------------------------------------------------
@@ -16,8 +21,14 @@ def index_commande(request):
 
 @login_required
 def liste_commandes(request):
-    commandes = Commande.objects.all().order_by('-date_ajout')
-    
+    commandes = _get_filtered_commandes(request)
+    return render(request, 'Commande/partials/liste_commandes.html', {'commandes': commandes})
+
+
+def _get_filtered_commandes(request):
+    """Construit la liste des commandes à partir des filtres visibles à l'écran."""
+    commandes = Commande.objects.all().select_related('demande', 'fournisseur').order_by('-date_ajout')
+
     # Recherche par texte
     q = request.GET.get('q', '').strip()
     if q:
@@ -26,23 +37,58 @@ def liste_commandes(request):
             Q(code_cmnd__icontains=q) |
             Q(fournisseur__nom__icontains=q)
         )
-    
+
     # Filtre par statut
     statut = request.GET.get('statut', '').strip()
     if statut:
         commandes = commandes.filter(statut_cmnd=statut)
-    
+
     # Filtre par date de début
     date_debut = request.GET.get('date_debut', '').strip()
     if date_debut:
         commandes = commandes.filter(date_cmnd__gte=date_debut)
-    
+
     # Filtre par date de fin
     date_fin = request.GET.get('date_fin', '').strip()
     if date_fin:
         commandes = commandes.filter(date_cmnd__lte=date_fin)
-    
-    return render(request, 'Commande/partials/liste_commandes.html', {'commandes': commandes})
+
+    return commandes
+
+
+def _commandes_export_rows(commandes):
+    """Prépare les lignes d'export pour les commandes."""
+    return [
+        [
+            commande.code_cmnd,
+            commande.demande.code_demande if commande.demande else '-',
+            commande.fournisseur.nom if commande.fournisseur else '-',
+            commande.date_cmnd.strftime('%d/%m/%Y') if commande.date_cmnd else '-',
+            commande.nombre_lignes,
+            f"{commande.montant_total:.2f} FCFA" if commande.montant_total else '-',
+            commande.get_statut_cmnd_display(),
+        ]
+        for commande in commandes
+    ]
+
+
+@login_required
+def export_commandes_csv(request):
+    """Exporte la liste filtrée des commandes au format CSV."""
+    commandes = _get_filtered_commandes(request)
+    headers = ["Code", "Demande", "Fournisseur", "Date commande", "Nombre d'articles", "Montant total", "Statut"]
+    filename = f"commandes_{timezone.now():%Y%m%d_%H%M}.csv"
+    return build_csv_response(filename, headers, _commandes_export_rows(commandes))
+
+
+@login_required
+def export_commandes_excel(request):
+    """Exporte la liste filtrée des commandes au format Excel."""
+    commandes = _get_filtered_commandes(request)
+    headers = ["Code", "Demande", "Fournisseur", "Date commande", "Nombre d'articles", "Montant total", "Statut"]
+    filename = f"commandes_{timezone.now():%Y%m%d_%H%M}.xlsx"
+    return build_excel_response(filename, "Commandes", headers, _commandes_export_rows(commandes))
+
 
 @login_required
 def CreateUpdateView_commande(request, pk=None):

@@ -2,12 +2,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 from .views import *
+from .exports import *
 
 app_name = 'commande'
 urlpatterns = [
     # Pages principales
     path('', index_commande, name='index-commande'),
     path('liste/', liste_commandes, name='liste-commandes'),
+    path('export/csv/', export_commandes_csv, name='export-commandes-csv'),
+    path('export/excel/', export_commandes_excel, name='export-commandes-excel'),
     
     # CRUD Commandes
     path('ajouter/', CreateUpdateView_commande, name='ajouter-commande'),
@@ -25,6 +28,8 @@ urlpatterns = [
     #----------------------------------------------------------------------
     path('livraison/', index_livraison, name='index-livraison'),
     path('livraison/liste/', liste_livraisons, name='liste-livraisons'),
+    path('livraison/export/csv/', export_livraisons_csv, name='export-livraisons-csv'),
+    path('livraison/export/excel/', export_livraisons_excel, name='export-livraisons-excel'),
     path('livraison/ajouter/', CreateUpdateView_livraison, name='ajouter-livraison'),
     path('livraison/modifier/<int:pk>/', CreateUpdateView_livraison, name='modifier-livraison'),
     path('livraison/detail/<int:pk>/', detail_livraison, name='detail-livraison'),

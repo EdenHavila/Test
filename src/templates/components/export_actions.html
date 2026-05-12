@@ -1,0 +1,13 @@
+<div class="export-toolbar">
+
+  <div class="export-toolbar__buttons">
+    <a class="export-btn export-btn--csv" href="{{ csv_url }}" onclick="return exportCurrentFilters(this)" title="{{ csv_title|default:'Exporter en CSV' }}">
+      <i class="bi bi-filetype-csv"></i>
+      <span>CSV</span>
+    </a>
+    <a class="export-btn export-btn--excel" href="{{ excel_url }}" onclick="return exportCurrentFilters(this)" title="{{ excel_title|default:'Exporter en Excel' }}">
+      <i class="bi bi-file-earmark-excel"></i>
+      <span>Excel</span>
+    </a>
+  </div>
+</div>
