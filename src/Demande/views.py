@@ -6,6 +6,14 @@ from .forms import *
 #from django.forms import modelformset_factory
 from .models import Demande
 from django.contrib.auth.decorators import login_required
+
+from django.http import HttpResponseForbidden
+from accounts.permissions import (
+    is_admin,
+    is_gestionnaire,
+    is_demandeur,
+    any_role_required,
+)
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 import json
@@ -32,8 +40,15 @@ def ligne_add(request):
 # Create your views here.
 #FormSetDetailsDemande = modelformset_factory(DetailsDemande, form=DetailsDemandeForm, extra=1, can_delete=True)
 
-@login_required 
+@login_required
+@any_role_required
 def index(request):
+    """Index des demandes.
+
+    Accessible aux utilisateurs participant au flux de demandes
+    (Demandeur, Gestionnaire, Admin). Le contrôle protège la page
+    côté serveur (le template masque aussi les liens).
+    """
     return render(request, 'Demande/index.html')
 
 """
@@ -90,6 +105,7 @@ def charge_champ_demandes(request):
     return HttpResponse(html)
 
 @login_required
+@any_role_required
 def liste(request):
     demandes = Demande.objects.all().order_by('-pk')
     
@@ -131,12 +147,18 @@ def liste(request):
 
 
 @login_required
+@any_role_required
 def mes_demandes_index(request):
-    """Vue pour afficher la page Mes Demandes"""
+    """Page 'Mes demandes'.
+
+    Visible par tous les rôles métiers; dans les templates/partials la
+    liste effective est filtrée (voir `mes_demandes_liste`).
+    """
     return render(request, 'Demande/mes_demandes.html')
 
 
 @login_required
+@any_role_required
 def mes_demandes_liste(request):
     """Vue pour afficher uniquement les demandes de l'utilisateur connecté"""
     # Filtrer par l'utilisateur connecté
@@ -185,6 +207,11 @@ def CreateUpdateView(request, pk=None):
         is_editing = False
         action = 'Enregistrer'
 
+    # Permission: edition autorisée pour Admin/Gestionnaire ou propriétaire
+    if is_editing:
+        if not (is_admin(request.user) or is_gestionnaire(request.user) or demande.utilisateur == request.user):
+            return HttpResponseForbidden("Vous n'avez pas la permission de modifier cette demande.")
+
     if request.method == 'POST':
         form = DemandeForm(request.POST, request.FILES, instance=demande, user=request.user)
         formset = FormSetDetailsDemande(request.POST, instance=demande, prefix='lignes')
@@ -232,15 +259,18 @@ def supprimer_demande(request, pk):
     """Vue pour supprimer une demande via HTMX"""
     demande = get_object_or_404(Demande, pk=pk)
     
+    # Permission: seul l'admin, le gestionnaire ou le propriétaire peut supprimer
+    if not (is_admin(request.user) or is_gestionnaire(request.user) or demande.utilisateur == request.user):
+        return HttpResponseForbidden("Vous n'avez pas la permission de supprimer cette demande.")
+
     if request.method == 'POST':
         demande.delete()
         messages.success(request, "Demande supprimée avec succès.")
-        
         # Retourne une réponse vide pour que HTMX supprime la ligne du tableau
         response = HttpResponse("")
         response["HX-Trigger"] = "refresh-messages"
         return response
-    
+
     # Si ce n'est pas une requête POST, retourner une erreur
     return HttpResponse(status=405)
 
@@ -259,6 +289,11 @@ def detail_demande(request, pk):
     # Récupérer les demandes qui regroupent cette demande (si type Demandeur)
     regroupee_par = demande.regroupee_par.all()
     
+    # Permission: gestionnaire/admin peuvent voir toutes les demandes,
+    # un demandeur ne peut voir que ses propres demandes.
+    if is_demandeur(request.user) and demande.utilisateur != request.user:
+        return HttpResponseForbidden("Accès refusé")
+
     context = {
         'demande': demande,
         'lignes': lignes,

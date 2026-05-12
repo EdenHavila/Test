@@ -33,6 +33,7 @@
             <a href="#"><img src="{% static 'ressources/logo_ncare.png' %}" alt="logo-pg" width="150"/></a>
           </div>
           <ul class="menu">
+            {# Rôle : tableau de bord visible à tous les utilisateurs authentifiés #}
             <li class="menu-item">
               <div class="menu-link">
                 <ion-icon name="speedometer-outline"></ion-icon> <span class="text">Dashboard</span>
@@ -41,6 +42,8 @@
                 <li class="sub-item"><a hx-get="{% url 'accounts:dashboard-index' %}" hx-target="#content-wrapper" hx-swap="innerHTML" hx-trigger="load, click">Vue d'ensemble</a></li>
               </ul>
             </li>
+            {# Rôle : demandes visibles pour Demandeur, Gestionnaire et Admin #}
+            {% if is_gestionnaire_user or is_admin_user or is_demandeur_user %}
             <li class="menu-item">
               <div class="menu-link">
                 <ion-icon name="mail-outline"></ion-icon>Demandes
@@ -52,13 +55,15 @@
                 </li>
               </ul>
             </li>
+            {% endif %}
+            {# Rôle : sections suivantes réservées aux Gestionnaire et Admin #}
+            {% if is_gestionnaire_user or is_admin_user %}
             <li class="menu-item">
               <div class="menu-link">
                 <ion-icon name="cart-outline"></ion-icon> <span class="text">Commandes</span>
               </div>
               <ul class="option-sub">
                 <li class="sub-item"><a hx-get="{% url 'commande:index-commande' %}" hx-target="#content-wrapper" hx-swap="innerHTML" >liste des commandes</a></li>
-                <!-- <li class="sub-item"><a href="#">Etudiants avec thème validé</a> </li> -->
               </ul>
             </li>
             <li class="menu-item">
@@ -99,12 +104,16 @@
                 <li class="sub-item"><a hx-get= "{% url 'inventaire:index-mouvement'%}" hx-target="#content-wrapper" hx-swap="innerHTML">Mouvements</a></li>
               </ul>
             </li>
+            {% endif %}
+
+            {# Rôle : lien vers l'administration Django, affiché seulement si l'utilisateur y a accès #}
+            {% if can_access_settings %}
             <li class="menu-item">
-              <a href="ok"></a><div class="menu-link">
+              <a href="/admin/"><div class="menu-link">
                 <ion-icon name="settings-outline"></ion-icon> Parametre
               </div></a>
-     
             </li>
+            {% endif %}
  
           </ul>
         </aside>

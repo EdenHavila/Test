@@ -29,11 +29,18 @@
         <div class="filter" style="justify-content: flex-start;">
             <div class="dashboard-summary" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
                 <span class="summary-badge" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: #e8f4fd; border-radius: 20px; font-size: 0.85rem; color: #0d6efd;">
-                    <i class="bi bi-activity"></i> Vue d'ensemble de votre activité
+                    <i class="bi bi-activity"></i>
+                    {% if is_demandeur_dashboard %}
+                    Vue d'ensemble de vos demandes
+                    {% else %}
+                    Vue d'ensemble de votre activité
+                    {% endif %}
                 </span>
+                {% if not is_demandeur_dashboard %}
                 <span class="summary-badge" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: #fff3cd; border-radius: 20px; font-size: 0.85rem; color: #856404;">
                     <i class="bi bi-exclamation-triangle"></i> {{ articles_faible_stock }} article(s) en alerte stock
                 </span>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -69,6 +76,7 @@
             </div>
         </div>
 
+        {% if not is_demandeur_dashboard %}
         <!-- Fournisseurs -->
         <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -96,6 +104,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Livraisons -->
         <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 12px; padding: 1.5rem; color: white; box-shadow: 0 4px 15px rgba(250, 112, 154, 0.3);">
@@ -125,11 +134,13 @@
             <p style="margin: 0.5rem 0 0; color: #666; font-size: 0.85rem;">Commandes terminées</p>
             <strong style="font-size: 1.3rem; color: #333;">{{ commandes_terminees }}</strong>
         </div>
+        {% if not is_demandeur_dashboard %}
         <div style="background: #fff; border-radius: 10px; padding: 1rem; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
             <i class="bi bi-exclamation-triangle" style="font-size: 1.5rem; color: #ffc107;"></i>
             <p style="margin: 0.5rem 0 0; color: #666; font-size: 0.85rem;">Stock faible</p>
             <strong style="font-size: 1.3rem; color: #333;">{{ articles_faible_stock }}</strong>
         </div>
+        {% endif %}
     </div>
 
     <!-- Tableaux d'activités récentes -->
