@@ -6,6 +6,7 @@ from catalogue.models import Bien, Service
 from .models import Commande, LigneCommande, Livraison
 from .forms import CommandeForm, LigneCommandeForm, LigneCommandeFormSet, LivraisonForm
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from monprojet.utils.export_utils import (
     build_csv_response,
     build_excel_response,
@@ -105,16 +106,22 @@ def CreateUpdateView_commande(request, pk=None):
     if request.method == 'POST':
         form = CommandeForm(request.POST, request.FILES, instance=commande)
         formset = LigneCommandeFormSet(request.POST, instance=commande, prefix='lignes')
-        
+
         if form.is_valid() and formset.is_valid():
-            commande_obj = form.save()
-            formset.instance = commande_obj
-            formset.save()
-            
-            # Réponse HTMX pour fermer le modal et rafraîchir la liste
-            response = HttpResponse()
-            response['HX-Trigger'] = 'refresh-messages, close-modal'
-            return response
+            try:
+                commande_obj = form.save()
+            except ValidationError as e:
+                # Ajouter l'erreur non-champée au formulaire pour affichage
+                message = e.messages[0] if getattr(e, 'messages', None) else str(e)
+                form.add_error(None, message)
+            else:
+                formset.instance = commande_obj
+                formset.save()
+
+                # Réponse HTMX pour fermer le modal et rafraîchir la liste
+                response = HttpResponse()
+                response['HX-Trigger'] = 'refresh-messages, close-modal'
+                return response
     else:
         form = CommandeForm(instance=commande)
         formset = LigneCommandeFormSet(instance=commande, prefix='lignes')

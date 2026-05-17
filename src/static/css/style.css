@@ -182,25 +182,25 @@ body {
 .layout-container .vertical-menu .menu .menu-item:nth-child(2):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(2) .option-sub{
   display: block;
-  height: 100px;
+  height: 110px;
 }
 
 .layout-container .vertical-menu .menu .menu-item:nth-child(3):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(3) .option-sub{
   display: block;
-  height: 40px;
+  height: 80px;
 }
 
 .layout-container .vertical-menu .menu .menu-item:nth-child(4):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(4) .option-sub{
   display: block;
-  height: 40px;
+  height: 80px;
 }
 
 .layout-container .vertical-menu .menu .menu-item:nth-child(5):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(5) .option-sub{
   display: block;
-  height: 40px;
+  height: 80px;
 }
 
 .layout-container .vertical-menu .menu .menu-item:nth-child(6):hover .option-sub,
@@ -212,7 +212,7 @@ body {
 .layout-container .vertical-menu .menu .menu-item:nth-child(7):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(7) .option-sub{
   display: block;
-  height: 40px;
+  height: 120px;
 }
 
 .layout-container .vertical-menu .menu .menu-item:nth-child(8):hover .option-sub,

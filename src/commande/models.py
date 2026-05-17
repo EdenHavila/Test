@@ -29,6 +29,11 @@ class Commande(models.Model):
                 model_class=Commande,
                 date_field="date_cmnd" # champ date à utiliser
             )
+        # Validation supplémentaire: n'autoriser la sauvegarde que si le fournisseur est actif
+        if self.fournisseur and getattr(self.fournisseur, 'statut', None) != 'Actif':
+            from django.core.exceptions import ValidationError
+            raise ValidationError("Impossible de créer/modifier une commande pour un fournisseur inactif.")
+
         super().save(*args, **kwargs)
 
     def __str__(self):

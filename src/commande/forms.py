@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
+from django.db.models import Q
 from .models import Commande, LigneCommande
 from Demande.models import Demande
 from Fournisseur.models import Fournisseur
@@ -22,7 +23,7 @@ class CommandeForm(forms.ModelForm):
     )
     
     fournisseur = forms.ModelChoiceField(
-        queryset=Fournisseur.objects.all(),
+        queryset=Fournisseur.objects.filter(statut='Actif'),
         widget=forms.Select(attrs={
             'class': 'form-select',
         }),
@@ -61,6 +62,14 @@ class CommandeForm(forms.ModelForm):
                 css_class='mb-3'
             ),
         )
+        # Lors de l'édition, conserver le fournisseur courant même s'il est devenu inactif,
+        # sinon n'afficher que les fournisseurs actifs pour la sélection.
+        if self.instance and getattr(self.instance, 'fournisseur', None):
+            current = self.instance.fournisseur
+            if current and current.statut != 'Actif':
+                self.fields['fournisseur'].queryset = Fournisseur.objects.filter(
+                    Q(pk=current.pk) | Q(statut='Actif')
+                )
 
 
 class LigneCommandeForm(forms.ModelForm):
