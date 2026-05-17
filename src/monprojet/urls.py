@@ -25,7 +25,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
     path('messages', messages_partial, name='messages_partial'),#partial pour les messages
-    path('monBlog/', include('monBlog.urls')),
     path('catalogue/', include('catalogue.urls')),
     path('Fournisseur/', include('Fournisseur.urls')),
     path('accounts/', include('accounts.urls')),

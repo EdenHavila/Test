@@ -3,6 +3,8 @@ const menu = document.querySelector("#vertical-menu");
 const overlay = document.querySelector(".overlay");
 const MenuItems = document.querySelectorAll(".menu-item");
 const SubMenuItems = document.querySelectorAll(".sub-item");
+const accountMenu = document.querySelector(".account-menu");
+const accountToggle = document.querySelector("[data-account-toggle]");
 
 
 const open_modal = document.querySelector(".new_request");
@@ -10,14 +12,17 @@ const modal = document.querySelector("#myModal");
 const close_modal = document.querySelector(".close");
 
 
-burgerBtn.addEventListener("click", (e) => {
-  // console.log("hello")
-  menu.classList.toggle("active");
-});
+if (burgerBtn && menu) {
+  burgerBtn.addEventListener("click", (e) => {
+    menu.classList.toggle("active");
+  });
+}
 
-overlay.addEventListener("click", (e) => {
-  menu.classList.remove("active");
-});
+if (overlay && menu) {
+  overlay.addEventListener("click", (e) => {
+    menu.classList.remove("active");
+  });
+}
 
 MenuItems.forEach((menu) => {
   menu.addEventListener("click", (e) => {
@@ -40,21 +45,52 @@ SubMenuItems.forEach((sub) => {
   });
 });
 
+if (accountMenu && accountToggle) {
+  const closeAccountMenu = () => {
+    accountMenu.classList.remove("is-open");
+    accountToggle.setAttribute("aria-expanded", "false");
+  };
+
+  accountToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = accountMenu.classList.toggle("is-open");
+    accountToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!accountMenu.contains(e.target)) {
+      closeAccountMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeAccountMenu();
+    }
+  });
+}
 
 
-open_modal.addEventListener("click", (e) => {
-  modal.classList.add("active");
-});
 
-close_modal.addEventListener("click", (e) => {
-  modal.classList.remove("active");
-})
+if (open_modal && modal) {
+  open_modal.addEventListener("click", (e) => {
+    modal.classList.add("active");
+  });
+}
 
-modal.addEventListener("click", (e) => {
-  if (e.target.id === "myModal") {
+if (close_modal && modal) {
+  close_modal.addEventListener("click", (e) => {
     modal.classList.remove("active");
-  }
-})
+  })
+}
+
+if (modal) {
+  modal.addEventListener("click", (e) => {
+    if (e.target.id === "myModal") {
+      modal.classList.remove("active");
+    }
+  })
+}
 
 /**
  * ✅ APPROCHE VANILLA JS (ACTUELLEMENT ACTIVE)
