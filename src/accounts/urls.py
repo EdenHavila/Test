@@ -6,6 +6,7 @@ from django.conf import settings
 app_name = 'accounts' 
 urlpatterns = [
     path('inscription/', inscription, name='inscription'),
+    path('inscription/confirmation/', lambda request: render(request, 'accounts/inscription_confirmation.html'), name='inscription_done'),
     path('connexion/', connexion, name='connexion'),
     path('deconnexion/', deconnexion, name='deconnexion'),
     #path('index/', index, name='index'),
@@ -37,6 +38,9 @@ urlpatterns = [
         auth.PasswordResetCompleteView.as_view(template_name='accounts/password_reset_complete.html'),
         name='password_reset_complete'
     ),
+
+    # Activation par email après inscription
+    path('activate/<uidb64>/<token>/', activate, name='activate'),
 
 
 ]

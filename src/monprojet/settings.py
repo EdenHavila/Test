@@ -156,3 +156,15 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Email configuration pour le développement : affichage des emails dans la console.
+# En production, configurez un serveur SMTP ou un provider d'email.
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Adresse par défaut utilisée comme expéditeur
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+
+# Durée (en secondes) du token de réinitialisation de mot de passe (1 heure par défaut)
+PASSWORD_RESET_TIMEOUT = 3600

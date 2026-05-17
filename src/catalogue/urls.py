@@ -24,7 +24,7 @@ urlpatterns = [
     path('service/ajouter/', CreateUpdateServiceView, name='ajouter-service'),
     path('service/modifier/<int:pk>/', CreateUpdateServiceView, name='modifier-service'),
     path('service/detail/<int:pk>/', detail_service, name='detail-service'),
-    # Pour la suite, prévoir delete_service
+    path('service/delete/<int:pk>/', supprimer_service, name='delete-service'),
 
     # Liste mixte
     path('liste/', liste_biens_services, name='liste-biens-services'),

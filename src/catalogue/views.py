@@ -14,13 +14,13 @@ from django.contrib.auth.decorators import login_required
 #---------------------------------------------------------------
 @login_required
 def index_service(request):
-    services = Service.objects.all()
+    services = Service.objects.select_related('categorie__famille').all()
     return render(request, 'Service/index_service.html', {'services': services})
 
 
 @login_required
 def liste_services(request):
-    services = Service.objects.select_related('categorie').all()
+    services = Service.objects.select_related('categorie__famille').all()
     q = request.GET.get('q', '').strip()
     if q:
         services = services.filter(
@@ -51,20 +51,35 @@ def CreateUpdateServiceView(request, pk=None):
 
     if request.method == "POST":
         if form.is_valid():
-            form.save()
+            service_obj = form.save()
             if is_editing:
                 messages.info(request, "Service modifié avec succès .")
-                response = render(request, 'Service/fragment_form.html')
+                response = render(request, 'Service/fragment_form.html', {
+                    "form": ServiceForm(instance=service_obj),
+                    "service": service_obj,
+                    "button_text": "Modifier",
+                    "is_editing": True,
+                })
                 response["HX-Trigger"] = json.dumps({
                     "refresh-messages": True,
-                    "update": True
+                    "update": True,
+                    "close-modal": True,
                 })
                 return response
             else:
                 form = ServiceForm()
                 messages.success(request, "Service ajouté avec succès .")
-                response = render(request, 'Service/fragment_form.html', {'form': form})
-                response["HX-Trigger"] = "refresh-messages"
+                response = render(request, 'Service/fragment_form.html', {
+                    'form': form,
+                    'service': None,
+                    'button_text': 'Ajouter',
+                    'is_editing': False,
+                })
+                response["HX-Trigger"] = json.dumps({
+                    "refresh-messages": True,
+                    "update": True,
+                    "close-modal": True,
+                })
                 return response
 
     return render(request, "Service/fragment_form.html", {
@@ -78,15 +93,17 @@ def CreateUpdateServiceView(request, pk=None):
 @login_required
 def detail_service(request, pk):
     service = get_object_or_404(Service, pk=pk)
-    return render(request, 'Service/fragment_detail.html', {'service': service})
+    return render(request, 'Service/partials/fragment_detail.html', {'service': service})
 
 
-#---------------------------------------------------------------
-# VUES POUR LES SERVICES
-#---------------------------------------------------------------
-def index_service(request):
-    services = Service.objects.all()
-    return render(request, 'Service/index_service.html',{'services': services})
+@login_required
+def supprimer_service(request, pk):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    service = get_object_or_404(Service, pk=pk)
+    service.delete()
+    return HttpResponse("")
 
 
 

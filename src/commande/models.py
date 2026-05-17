@@ -113,6 +113,8 @@ class Livraison(models.Model):
                 date_field="date_livraison"
             )
         super().save(*args, **kwargs)
+        if self.statut == 'complete' and self.commande_id:
+            Commande.objects.filter(pk=self.commande_id).update(statut_cmnd='terminee')
 
     def __str__(self):
         return self.code_livraison

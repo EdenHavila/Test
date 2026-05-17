@@ -45,6 +45,21 @@
             {{demande.statut_demande}}
         </span>
     </td>
+    <td class="text-truncate">
+        {{ demande.utilisateur.get_username|default:"-" }}
+    </td>
+    <td class="text-truncate mon-bootstrap">
+        {% if demande.fichier_joint %}
+            <a href="{{ demande.fichier_joint.url }}"
+               target="_blank"
+               class="btn btn-sm btn-outline-secondary"
+               title="Télécharger le fichier joint">
+                <i class="bi bi-file-earmark-arrow-down"></i>
+            </a>
+        {% else %}
+            <span class="text-muted">-</span>
+        {% endif %}
+    </td>
     <td class="text-truncate mon-bootstrap">
         <div class="d-flex gap-2">
             {# Bouton Voir détails #}
@@ -77,7 +92,7 @@
 </tr>
 {% empty %}
 <tr>
-    <td colspan="9" class="text-center text-muted py-4">
+    <td colspan="11" class="text-center text-muted py-4">
         <i class="bi bi-inbox d-block mb-2" style="font-size: 2rem;"></i>
         Aucune demande trouvée
     </td>

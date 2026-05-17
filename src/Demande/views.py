@@ -121,7 +121,7 @@ def _get_filtered_demandes(request, user_only=False):
 
     Le paramètre `user_only` permet de limiter l'export aux demandes de l'utilisateur connecté.
     """
-    demandes = Demande.objects.all().order_by('-pk')
+    demandes = Demande.objects.select_related('utilisateur').all().order_by('-pk')
     if user_only:
         demandes = demandes.filter(utilisateur=request.user)
 

@@ -94,7 +94,9 @@ body {
 .layout-container .vertical-menu .logo a {
   display: block;
   padding: 8px 0;
+  cursor: pointer;
 }
+
 
 .layout-container .vertical-menu .menu {
   height: 100%;
@@ -173,10 +175,53 @@ body {
 .layout-container .vertical-menu .menu .menu-item:nth-child(1):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(1) .option-sub{
   display: block;
+  height: 70px;
+}
+
+
+.layout-container .vertical-menu .menu .menu-item:nth-child(2):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(2) .option-sub{
+  display: block;
+  height: 100px;
+}
+
+.layout-container .vertical-menu .menu .menu-item:nth-child(3):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(3) .option-sub{
+  display: block;
   height: 40px;
 }
 
-.layout-container .vertical-menu .menu .menu-item:nth-child(2):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item:nth-child(4):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(4) .option-sub{
+  display: block;
+  height: 40px;
+}
+
+.layout-container .vertical-menu .menu .menu-item:nth-child(5):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(5) .option-sub{
+  display: block;
+  height: 40px;
+}
+
+.layout-container .vertical-menu .menu .menu-item:nth-child(6):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(6) .option-sub{
+  display: block;
+  height: 150px;
+}
+
+.layout-container .vertical-menu .menu .menu-item:nth-child(7):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(7) .option-sub{
+  display: block;
+  height: 40px;
+}
+
+.layout-container .vertical-menu .menu .menu-item:nth-child(8):hover .option-sub,
+.layout-container .vertical-menu .menu .menu-item.active:nth-child(8) .option-sub{
+  display: block;
+  height: 40px;
+}
+
+/* .layout-container .vertical-menu .menu .menu-item:nth-child(2):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item:nth-child(3):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item:nth-child(4):hover .option-sub,
 .layout-container .vertical-menu .menu .menu-item:nth-child(5):hover .option-sub,
@@ -192,10 +237,11 @@ body {
 .layout-container .vertical-menu .menu .menu-item.active:nth-child(8) .option-sub {
   display: block;
   height: 150px;
-}
+} */
 
 .option-sub li a {
   font-size: 0.7em;
+  cursor: pointer;
 }
 
 

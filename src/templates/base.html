@@ -30,7 +30,8 @@
       <div class="layout-container">
         <aside class="vertical-menu" id="vertical-menu">
           <div class="logo">
-            <a href="#"><img src="{% static 'ressources/logo_ncare.png' %}" alt="logo-pg" width="150"/></a>
+            <!-- <a href="#"><img src="{% static 'ressources/logo_ncare.png' %}" alt="logo-pg" width="150"/></a> -->
+            <a hx-get="{% url 'accounts:dashboard-index' %}" hx-target="#content-wrapper" hx-swap="innerHTML"><img src="{% static 'ressources/logo_ncare.png' %}" alt="logo-pg" width="150"/></a>
           </div>
           <ul class="menu">
             {# Rôle : tableau de bord visible à tous les utilisateurs authentifiés #}

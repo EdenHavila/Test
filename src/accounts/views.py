@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .forms import InscriptionForm, ConnexionForm
+from .models import User
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.template.loader import render_to_string
+from django.contrib import messages
 # Create your views here.
 
 from django.core.mail import send_mail
@@ -18,9 +25,42 @@ def inscription(request):
     if request.method == 'POST':
         form = InscriptionForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)  # Connecter l'utilisateur après inscription
-            return redirect('accounts:connexion')
+            # Créer l'utilisateur en mode non actif et envoyer un email d'activation
+            try:
+                user = form.save(commit=False)
+                user.is_active = False
+                user.save()
+
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                activation_link = request.build_absolute_uri(
+                    reverse('accounts:activate', args=[uid, token])
+                )
+
+                subject = "Activation de votre compte"
+                message = (
+                    f"Bonjour {user.first_name or user.username},\n\n"
+                    "Merci de vous être inscrit. Pour activer votre compte, cliquez sur le lien suivant :\n\n"
+                    f"{activation_link}\n\n"
+                    "Si vous n'avez pas demandé cette inscription, ignorez cet email."
+                )
+
+                try:
+                    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=False)
+                except Exception as e:
+                    # Log en console (dev) et informer l'utilisateur
+                    print('Erreur envoi email activation:', e)
+                    messages.warning(request, "Inscription enregistrée mais l'email d'activation n'a pas pu être envoyé. Contactez un administrateur.")
+                    return redirect('accounts:connexion')
+
+                messages.success(request, "Inscription enregistrée. Vérifiez votre email pour activer votre compte.")
+                return redirect('accounts:inscription_done')
+            except Exception as e:
+                print('Erreur lors de la création du user:', e)
+                messages.error(request, 'Une erreur est survenue lors de votre inscription. Réessayez plus tard.')
+        else:
+            # Form invalid → afficher erreurs via template
+            messages.error(request, 'Le formulaire contient des erreurs, veuillez vérifier.')
     else:
         form = InscriptionForm()
 
@@ -138,6 +178,22 @@ def dashboard_index(request):
 def deconnexion(request):
     logout(request)
     return redirect('accounts:connexion')
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except Exception:
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return redirect('accounts:dashboard')
+    else:
+        return HttpResponse('Lien d\'activation invalide ou expiré.')
 
 """Vue de test pour envoyer un email via SendGrid."""
 """"

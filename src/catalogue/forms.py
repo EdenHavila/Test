@@ -115,6 +115,8 @@ class ServiceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.categorie_id:
+            self.fields['sous_categorie'].initial = self.instance.categorie.sous_categories.first()
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
@@ -135,4 +137,26 @@ class ServiceForm(forms.ModelForm):
                 ),
             ),
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        sous_categorie = cleaned_data.get('sous_categorie')
+
+        if sous_categorie and sous_categorie.type != 'Service':
+            self.add_error('sous_categorie', 'Veuillez sélectionner une sous-catégorie de type Service.')
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        service = super().save(commit=False)
+        sous_categorie = self.cleaned_data.get('sous_categorie')
+
+        if sous_categorie:
+            service.categorie = sous_categorie.categorie
+
+        if commit:
+            service.save()
+            self.save_m2m()
+
+        return service
 

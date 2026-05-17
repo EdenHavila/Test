@@ -150,11 +150,21 @@ class Service(models.Model):
     frequence  = models.CharField(max_length=20, choices=FREQUENCE, default='draft')
     description = models.TextField()
 
+    def generate_reference(self):
+        """Génère une référence basée sur la catégorie et un compteur séquentiel."""
+        compteur = Service.objects.filter(categorie=self.categorie).exclude(pk=self.pk).count() + 1
+        return f"{self.categorie.reference}-{compteur:03d}"
+
     def save(self, *args, **kwargs):
-        if not self.reference:
-            # Utilisation du compteur pour générer la référence
-            self.reference = ReferenceCounter.get_next_reference('Service', 'SERV',3)
+        if self.categorie_id:
+            self.reference = self.generate_reference()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.designation
+
+    def get_delete_url(self):
+        return reverse("catalogue:delete-service", args=[self.id])
+
+    def get_target_id(self):
+        return f"#service-{self.id}"
